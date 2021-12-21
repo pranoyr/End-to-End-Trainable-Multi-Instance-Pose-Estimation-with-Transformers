@@ -6,6 +6,7 @@ Mostly copy-paste from https://github.com/pytorch/vision/blob/13b35ff/references
 """
 from pathlib import Path
 from PIL import Image
+from numpy.core.defchararray import array
 import torch
 from pycocotools.coco import COCO
 import numpy as np
@@ -106,6 +107,13 @@ class ConvertCocoPolysToMask(object):
 
     def __call__(self, image, target):
         w, h = image.size
+
+
+        img_array = np.array(image)
+        if img_array.shape[2] == 1:
+            img_array = cv2.cvtColor(img_array, cv2.COLOR_GRAY2RGB)
+            image = Image.fromarray(img_array)
+        
 
         image_id = target["image_id"]
         image_id = torch.tensor([image_id])

@@ -42,6 +42,16 @@ indices = [c[i] for i, c in enumerate(C.split(sizes, -1))]
 print(indices)
 
 
+import cv2
+import numpy as np
+gray = cv2.imread("/home/pranoy/code/detr/data/train2017/000000193892.jpg")[:,:,1]
+print(gray.shape)
+im_rgb = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
+print(im_rgb.shape)
+
+
+
+
 
 
 # import torch
