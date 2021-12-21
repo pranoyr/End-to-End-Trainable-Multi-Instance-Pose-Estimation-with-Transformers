@@ -110,6 +110,7 @@ class ConvertCocoPolysToMask(object):
 
 
         img_array = np.array(image)
+        print(img_array.shape)
         if len(img_array) == 2:
             img_array = cv2.cvtColor(img_array, cv2.COLOR_GRAY2RGB)
             image = Image.fromarray(img_array)
