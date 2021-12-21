@@ -5,47 +5,81 @@ COCO dataset which returns image_id for evaluation.
 Mostly copy-paste from https://github.com/pytorch/vision/blob/13b35ff/references/detection/coco_utils.py
 """
 from pathlib import Path
-
+from PIL import Image
 import torch
+from pycocotools.coco import COCO
+import numpy as np
 import torch.utils.data
+import cv2
 import torchvision
 from pycocotools import mask as coco_mask
-import numpy as np
 
 import datasets.transforms as T
-import cv2
 
 
-class CocoDetection(torchvision.datasets.CocoDetection):
+# class CocoDetection(torchvision.datasets.CocoDetection):
+#     def __init__(self, img_folder, ann_file, transforms, return_masks):
+#         super(CocoDetection, self).__init__(img_folder, ann_file)
+#         self._transforms = transforms
+#         self.prepare = ConvertCocoPolysToMask(return_masks)
+
+
+#     def __getitem__(self, idx):
+#         print(idx)
+#         img, target = super(CocoDetection, self).__getitem__(idx)
+#         image_id = self.ids[idx]
+#         print(target)
+#         print(image_id)
+#         target = {'image_id': image_id, 'annotations': target}
+#         img, target = self.prepare(img, target)
+#         if self._transforms is not None:
+#             img, target = self._transforms(img, target)
+#         return img, target
+
+
+
+
+class CocoDetection(torch.utils.data.Dataset):
     def __init__(self, img_folder, ann_file, transforms, return_masks):
-        super(CocoDetection, self).__init__(img_folder, ann_file)
+        super(CocoDetection, self).__init__()
         self._transforms = transforms
         self.prepare = ConvertCocoPolysToMask(return_masks)
 
+        root_path = "/home/pranoy/code/detr/data/"
+        self.img_folder = root_path + "/train2017/"
+        self.coco=COCO(root_path + "/annotations/person_keypoints_train2017.json")
+
+        imgIds = sorted(self.coco.getImgIds())
+
+        self.all_imgIds = []
+        for i in imgIds:
+            if self.coco.getAnnIds(imgIds=i) == []:
+                continue
+            self.all_imgIds.append(i)
+
+    def __len__(self):
+        return len(self.all_imgIds)
+
     def __getitem__(self, idx):
-        img, target = super(CocoDetection, self).__getitem__(idx)
-        image_id = self.ids[idx]
+        image_id = self.all_imgIds[idx]
+        ann_ids = self.coco.getAnnIds(imgIds=image_id)
+        target = self.coco.loadAnns(ann_ids)
+
         target = {'image_id': image_id, 'annotations': target}
+        img = Image.open(self.img_folder + self.coco.loadImgs(image_id)[0]['file_name'])
         img, target = self.prepare(img, target)
-        print(target)
-        print(image_id)
+
+        # img = np.array(img)
+        # cv2.imwrite("a.jpg", img)
+        # for person in target['keypoints']:
+        #     for keypoint in person:
+        #         keypoint = keypoint.type(torch.int32)
+        #         cv2.circle(img, (keypoint[0].item(), keypoint[1].item()), 1, (0, 0, 255), -1)
+        # cv2.imwrite("b.jpg", img)
+
         if self._transforms is not None:
             img, target = self._transforms(img, target)
-        
 
-        
-        # img = img.permute(1,2,0).numpy() *255
-        # img = np.ascontiguousarray(img, dtype=np.uint8)
-        
-        # keypoints = target['keypoints']
-        # print(keypoints.shape)
-        # keypoints = keypoints.type(torch.int32)
-        # print((int(keypoints[0][0][0].item()), int(keypoints[0][0][1].item())))
-        # for i in range (17):
-        #     cv2.circle(img, (int(keypoints[0][i][0].item()), int(keypoints[0][i][1].item())), 2, (0,0,255), -1)
-        # cv2.imwrite("/home/pranoy/Desktop/a.jpg", img)
-        
-        # print("***")
         return img, target
 
 
@@ -142,7 +176,7 @@ def make_coco_transforms(image_set):
 
     if image_set == 'train':
         return T.Compose([
-            T.RandomHorizontalFlip(0.5),
+            T.RandomHorizontalFlip(),
             T.RandomSelect(
                 T.RandomResize(scales, max_size=1333),
                 T.Compose([
@@ -151,13 +185,13 @@ def make_coco_transforms(image_set):
                     T.RandomResize(scales, max_size=1333),
                 ])
             ),
-           normalize
+            normalize,
         ])
 
     if image_set == 'val':
         return T.Compose([
             T.RandomResize([800], max_size=1333),
-           normalize,
+            normalize,
         ])
 
     raise ValueError(f'unknown {image_set}')

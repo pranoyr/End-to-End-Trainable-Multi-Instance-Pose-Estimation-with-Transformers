@@ -34,7 +34,7 @@ class DETR(nn.Module):
 		self.num_queries = num_queries
 		self.transformer = transformer
 		hidden_dim = transformer.d_model
-		num_body_parts = (3 * 17) + 1 # 17  (del_x1, del_y1, vis) * 17 + 1 
+		num_body_parts = 53 # 17  (del_x1, del_y1, vis) * 17 + 2 
 		self.class_embed = nn.Linear(hidden_dim, num_classes + 1)
 		self.pose_embed = MLP(hidden_dim, hidden_dim, num_body_parts, 3)
 		self.query_embed = nn.Embedding(num_queries, hidden_dim)
@@ -63,16 +63,16 @@ class DETR(nn.Module):
 
 		src, mask = features[-1].decompose()
 		assert mask is not None
-		print("input")
-		print(self.input_proj(src).shape)
+		# print("input")
+		# print(self.input_proj(src).shape)
 		hs = self.transformer(self.input_proj(src), mask, self.query_embed.weight, pos[-1])[0]
 
-		print(hs.shape)
+		# print(hs.shape)
 
 		outputs_class = self.class_embed(hs)
 		outputs_keypoints = self.pose_embed(hs).sigmoid()	
 
-		print(outputs_keypoints[-1].shape)
+		# print(outputs_keypoints[-1].shape)
 		out = {'pred_logits': outputs_class[-1], 'pred_keypoints': outputs_keypoints[-1]}
 		if self.aux_loss:
 			out['aux_outputs'] = self._set_aux_loss(outputs_class, outputs_keypoints)
@@ -152,20 +152,46 @@ class SetCriterion(nn.Module):
 		   targets dicts must contain the key "boxes" containing a tensor of dim [nb_target_boxes, 4]
 		   The target boxes are expected in format (center_x, center_y, w, h), normalized by the image size.
 		"""
-		assert 'pred_boxes' in outputs
+		#assert 'pred_boxes' in outputs
 		idx = self._get_src_permutation_idx(indices)
-		src_boxes = outputs['pred_boxes'][idx]
-		target_boxes = torch.cat([t['boxes'][i] for t, (_, i) in zip(targets, indices)], dim=0)
+		src_boxes = outputs['pred_keypoints'][idx]
 
-		loss_bbox = F.l1_loss(src_boxes, target_boxes, reduction='none')
+		src_C = src_boxes[:, :2]
+		src_Z = src_boxes[:, 2:36]
+		src_V = src_boxes[:, 36:]
+		# print(src_C.shape)
+		# print(src_Z.shape)
+		# print(src_V.shape)
+
+
+		target_C = torch.cat([t['keypoints'][i][:, :2] for t, (_, i) in zip(targets, indices)], dim=0)
+		target_Z = torch.cat([t['keypoints'][i][:, 2:36] for t, (_, i) in zip(targets, indices)], dim=0)
+		target_V = torch.cat([t['keypoints'][i][:, 36:] for t, (_, i) in zip(targets, indices)], dim=0)
+
+		# print("t")
+		# print(target_C.shape)
+		# print(target_Z.shape)
+		# print(target_V.shape)
+
+		Vgt_ = torch.repeat_interleave(target_V , 2, dim=1)
+		offset_loss =  F.l1_loss(Vgt_  * src_Z, Vgt_ * target_Z, reduction = 'none')
+		viz_loss  =  F.l1_loss(src_V, target_V, reduction = 'none')
+		center_loss =  F.l1_loss(src_C , target_C, reduction='none')
+
+		# print("centre")
+		# print(center_loss.shape)
+		#
+		# loss_bbox = F.l1_loss(src_boxes, target_boxes, reduction='none')
+
+		total_keypoints_loss = torch.sum(offset_loss) + torch.sum(viz_loss) + torch.sum(center_loss)
 
 		losses = {}
-		losses['loss_bbox'] = loss_bbox.sum() / num_boxes
+		losses['loss_bbox'] = total_keypoints_loss / num_boxes
 
-		loss_giou = 1 - torch.diag(box_ops.generalized_box_iou(
-			box_ops.box_cxcywh_to_xyxy(src_boxes),
-			box_ops.box_cxcywh_to_xyxy(target_boxes)))
-		losses['loss_giou'] = loss_giou.sum() / num_boxes
+		# loss_giou = 1 - torch.diag(box_ops.generalized_box_iou(
+		# 	box_ops.box_cxcywh_to_xyxy(src_boxes),
+		# 	box_ops.box_cxcywh_to_xyxy(target_boxes)))
+		# losses['loss_giou'] = loss_giou.sum() / num_boxes
 		return losses
 
 	def loss_masks(self, outputs, targets, indices, num_boxes):
@@ -322,6 +348,7 @@ def build(args):
 		# for panoptic, we just add a num_classes that is large enough to hold
 		# max_obj_id + 1, but the exact value doesn't really matter
 		num_classes = 250
+	num_classes = 1
 	device = torch.device(args.device)
 
 	backbone = build_backbone(args)
