@@ -113,7 +113,7 @@ class ConvertCocoPolysToMask(object):
         if len(img_array) == 2:
             img_array = cv2.cvtColor(img_array, cv2.COLOR_GRAY2RGB)
             image = Image.fromarray(img_array)
-
+            print(image.shape)
 
         image_id = target["image_id"]
         image_id = torch.tensor([image_id])
