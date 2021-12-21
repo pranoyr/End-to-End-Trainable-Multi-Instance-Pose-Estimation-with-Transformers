@@ -35,7 +35,7 @@ class DETR(nn.Module):
 		self.transformer = transformer
 		hidden_dim = transformer.d_model
 		num_body_parts = 53 # 17  (del_x1, del_y1, vis) * 17 + 2 
-		self.class_embed = nn.Linear(hidden_dim, num_classes + 1)
+		self.class_embed_out = nn.Linear(hidden_dim, num_classes + 1)
 		self.pose_embed = MLP(hidden_dim, hidden_dim, num_body_parts, 3)
 		self.query_embed = nn.Embedding(num_queries, hidden_dim)
 		self.input_proj = nn.Conv2d(backbone.num_channels, hidden_dim, kernel_size=1)
@@ -69,7 +69,7 @@ class DETR(nn.Module):
 
 		# print(hs.shape)
 
-		outputs_class = self.class_embed(hs)
+		outputs_class = self.class_embed_out(hs)
 		outputs_keypoints = self.pose_embed(hs).sigmoid()	
 
 		# print(outputs_keypoints[-1].shape)
