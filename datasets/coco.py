@@ -46,7 +46,7 @@ class CocoDetection(torch.utils.data.Dataset):
         self._transforms = transforms
         self.prepare = ConvertCocoPolysToMask(return_masks)
 
-        root_path = "/home/neuroplex/code/detr/data/"
+        root_path = "/home/pranoy/code/detr/data/"
         self.img_folder = root_path + "/train2017/"
         self.coco=COCO(root_path + "/annotations/person_keypoints_train2017.json")
 
