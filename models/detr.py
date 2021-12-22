@@ -188,6 +188,8 @@ class SetCriterion(nn.Module):
 
 		Vgt_ = torch.repeat_interleave(V_gt , 2, dim=1)
 		offset_loss =  F.l1_loss(Vgt_  * Z_pred, Vgt_ * Z_gt, reduction = 'none')
+		print(V_pred)
+		print(V_gt)
 		viz_loss  =  nn.MSELoss(V_pred, V_gt, reduction = 'none')
 		center_loss =  nn.MSELoss(C_pred , C_gt, reduction='none')
 		abs_loss = F.l1_loss(A_pred, A_gt, reduction='none')
