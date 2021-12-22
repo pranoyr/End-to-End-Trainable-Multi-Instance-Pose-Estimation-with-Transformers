@@ -200,9 +200,9 @@ def main(args):
         if args.output_dir:
             checkpoint_paths = [output_dir / 'checkpoint.pth']
             # extra checkpoint before LR drop and every 100 epochs
-            if (epoch + 1) % args.lr_drop == 0 or (epoch + 1) % 100 == 0:
+            # if (epoch + 1) % args.lr_drop == 0 or (epoch + 1) % 100 == 0:
                 # checkpoint_paths.append(output_dir / f'checkpoint{epoch:04}.pth')
-                checkpoint_paths.append(output_dir / "model.pth")
+            checkpoint_paths.append(output_dir / "model.pth")
             for checkpoint_path in checkpoint_paths:
                 utils.save_on_master({
                     'model': model_without_ddp.state_dict(),
