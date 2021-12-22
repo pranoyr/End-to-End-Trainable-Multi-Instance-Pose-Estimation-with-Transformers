@@ -114,7 +114,7 @@ class HungarianMatcher(nn.Module):
         cost_class = -out_prob[:, tgt_ids]
 
         
-        Vgt_ = torch.repeat_interleave(V_gt , 2, dim=1)
+        # Vgt_ = torch.repeat_interleave(V_gt , 2, dim=1)
         offset_loss =  torch.cdist(Z_pred, Z_gt, p=1)
         # offset_loss =  torch.cdist(torch.cat([Vgt_, torch.zeros(len(Z_pred)-len(V_gt), 34).cuda()]) * Z_pred, Vgt_ * Z_gt, p=1)
         viz_loss  =  torch.cdist(V_pred, V_gt, p=2)
