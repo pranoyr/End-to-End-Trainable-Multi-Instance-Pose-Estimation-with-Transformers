@@ -198,7 +198,7 @@ class SetCriterion(nn.Module):
 		#
 		# loss_bbox = F.l1_loss(src_boxes, target_boxes, reduction='none')
 
-		total_keypoints_loss = self.l_deltas * torch.sum(offset_loss) + self.l_vis *  self.torch.sum(viz_loss) + self.l_ctr *  torch.sum(center_loss) + self.l_abs * torch.sum(abs_loss)
+		total_keypoints_loss = self.l_deltas * torch.sum(offset_loss) + self.l_vis *  torch.sum(viz_loss) + self.l_ctr *  torch.sum(center_loss) + self.l_abs * torch.sum(abs_loss)
 
 		losses = {}
 		losses['loss_bbox'] = total_keypoints_loss / num_boxes
