@@ -37,3 +37,17 @@ print(a.shape)
 
 # print(offsets)
 
+
+
+import torch
+
+centre = torch.tensor([[2,3], [1,5]])
+print(centre)
+
+centre = torch.repeat_interleave(centre.unsqueeze(1), 17, dim=1).view(-1,34)
+print(centre)
+
+a = torch.ones(1,34)
+b = torch.zeros(1,34)
+c = torch.cat([a,b], dim=0)
+print(centre+ c)

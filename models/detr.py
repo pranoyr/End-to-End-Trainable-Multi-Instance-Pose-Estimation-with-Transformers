@@ -42,6 +42,7 @@ class DETR(nn.Module):
 		self.backbone = backbone
 		self.aux_loss = aux_loss
 
+
 	def forward(self, samples: NestedTensor):
 		""" The forward expects a NestedTensor, which consists of:
 			   - samples.tensor: batched images, of shape [batch_size x 3 x H x W]
@@ -111,6 +112,10 @@ class SetCriterion(nn.Module):
 		empty_weight = torch.ones(self.num_classes + 1)
 		empty_weight[-1] = self.eos_coef
 		self.register_buffer('empty_weight', empty_weight)
+		self.l_deltas = 0.5
+		self.l_vis = 0.2
+		self.l_ctr = 0.5
+		self.l_abs = 4
 
 	def loss_labels(self, outputs, targets, indices, num_boxes, log=True):
 		"""Classification loss (NLL)
@@ -156,34 +161,44 @@ class SetCriterion(nn.Module):
 		idx = self._get_src_permutation_idx(indices)
 		src_boxes = outputs['pred_keypoints'][idx]
 
-		src_C = src_boxes[:, :2]
-		src_Z = src_boxes[:, 2:36]
-		src_V = src_boxes[:, 36:]
+		C_pred = src_boxes[:, :2]
+		Z_pred = src_boxes[:, 2:36]
+		V_pred = src_boxes[:, 36:]
 		# print(src_C.shape)
 		# print(src_Z.shape)
 		# print(src_V.shape)
 
 
-		target_C = torch.cat([t['keypoints'][i][:, :2] for t, (_, i) in zip(targets, indices)], dim=0)
-		target_Z = torch.cat([t['keypoints'][i][:, 2:36] for t, (_, i) in zip(targets, indices)], dim=0)
-		target_V = torch.cat([t['keypoints'][i][:, 36:] for t, (_, i) in zip(targets, indices)], dim=0)
+		C_gt = torch.cat([t['keypoints'][i][:, :2] for t, (_, i) in zip(targets, indices)], dim=0)
+		Z_gt = torch.cat([t['keypoints'][i][:, 2:36] for t, (_, i) in zip(targets, indices)], dim=0)
+		V_gt = torch.cat([t['keypoints'][i][:, 36:] for t, (_, i) in zip(targets, indices)], dim=0)
+
+		C_gt_expand = torch.repeat_interleave(C_gt.unsqueeze(1), 17, dim=1).view(-1,34)
+		A_gt = C_gt_expand + Z_gt
+
+		C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
+		A_pred = C_pred_expand + Z_pred
+
+
 
 		# print("t")
 		# print(target_C.shape)
 		# print(target_Z.shape)
 		# print(target_V.shape)
 
-		Vgt_ = torch.repeat_interleave(target_V , 2, dim=1)
-		offset_loss =  F.l1_loss(Vgt_  * src_Z, Vgt_ * target_Z, reduction = 'none')
-		viz_loss  =  F.l1_loss(src_V, target_V, reduction = 'none')
-		center_loss =  F.l1_loss(src_C , target_C, reduction='none')
+		Vgt_ = torch.repeat_interleave(V_gt , 2, dim=1)
+		offset_loss =  F.l1_loss(Vgt_  * Z_pred, Vgt_ * Z_gt, reduction = 'none')
+		viz_loss  =  nn.MSELoss(V_pred, V_gt, reduction = 'none')
+		center_loss =  nn.MSELoss(C_pred , C_gt, reduction='none')
+		abs_loss = F.l1_loss(A_pred, A_gt, reduction='none')
+
 
 		# print("centre")
 		# print(center_loss.shape)
 		#
 		# loss_bbox = F.l1_loss(src_boxes, target_boxes, reduction='none')
 
-		total_keypoints_loss = torch.sum(offset_loss) + torch.sum(viz_loss) + torch.sum(center_loss)
+		total_keypoints_loss = self.l_deltas * torch.sum(offset_loss) + self.l_vis *  self.torch.sum(viz_loss) + self.l_ctr *  torch.sum(center_loss) + self.l_abs * torch.sum(abs_loss)
 
 		losses = {}
 		losses['loss_bbox'] = total_keypoints_loss / num_boxes

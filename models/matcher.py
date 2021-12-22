@@ -30,9 +30,10 @@ class HungarianMatcher(nn.Module):
         self.cost_class = cost_class
         self.cost_bbox = cost_bbox
         self.cost_giou = cost_giou
-        self.l1 = 1
-        self.l2 = 1
-        self.l_ctr =1
+        self.l_deltas = 0.5
+        self.l_vis = 0.2
+        self.l_ctr = 0.5
+        self.l_abs = 4
         assert cost_class != 0 or cost_bbox != 0 or cost_giou != 0, "all costs cant be 0"
 
     @torch.no_grad()
@@ -80,10 +81,17 @@ class HungarianMatcher(nn.Module):
         Z_gt = tgt_keypoints[:, 2:36]
         V_gt = tgt_keypoints[:, 36:]
 
-        
+        C_gt_expand = torch.repeat_interleave(C_gt.unsqueeze(1), 17, dim=1).view(-1,34)
+        A_gt = C_gt_expand + Z_gt
+
+        C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
+        A_pred = C_pred_expand + Z_pred
+
+
         # C_gt: torch.Size([2, 2])
         # Z_gt: torch.Size([2, 34])
         # V_gt: torch.Size([2, 17])
+        # A_gt: torch.Size([2, 34])
 
         # print("C_gt: ", C_gt.shape)
         # print("Z_gt: ", Z_gt.shape)
@@ -97,6 +105,7 @@ class HungarianMatcher(nn.Module):
         # C_pred:  torch.Size([100, 2])
         # Z_pred:  torch.Size([100, 34])
         # V_pred:  torch.Size([100, 17])
+        # A_pred:  torch.Size([100, 34])
 
         # Compute the classification cost. Contrary to the loss, we don't use the NLL,
         # but approximate it in 1 - proba[target class].
@@ -110,6 +119,8 @@ class HungarianMatcher(nn.Module):
         # offset_loss =  torch.cdist(torch.cat([Vgt_, torch.zeros(len(Z_pred)-len(V_gt), 34).cuda()]) * Z_pred, Vgt_ * Z_gt, p=1)
         viz_loss  =  torch.cdist(V_pred, V_gt, p=2)
         center_loss =  torch.cdist(C_pred ,C_gt, p=2)
+        abs_loss = torch.cdist(A_pred, A_gt, p=1)
+
 
 
         # print("offset_loss: ", offset_loss.shape)
@@ -127,7 +138,7 @@ class HungarianMatcher(nn.Module):
         # C = self.cost_bbox * cost_bbox + self.cost_class * cost_class + self.cost_giou * cost_giou
         # print(f'cost_class: {cost_class.shape}')
         
-        C =  self.cost_class * cost_class +  self.l1 * offset_loss + self.l2 * viz_loss + self.l_ctr * center_loss
+        C =  self.cost_class * cost_class +  self.l_deltas * offset_loss + self.l_vis * viz_loss + self.l_ctr * center_loss + self.l_abs * abs_loss
         C = C.view(bs, num_queries, -1).cpu()
 
         sizes = [len(v["keypoints"]) for v in targets]
