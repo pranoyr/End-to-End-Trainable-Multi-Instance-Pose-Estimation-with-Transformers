@@ -129,6 +129,7 @@ class SetCriterion(nn.Module):
 		target_classes = torch.full(src_logits.shape[:2], self.num_classes,
 									dtype=torch.int64, device=src_logits.device)
 		target_classes[idx] = target_classes_o
+		print(target_classes)
 
 		loss_ce = F.cross_entropy(src_logits.transpose(1, 2), target_classes, self.empty_weight)
 		losses = {'loss_ce': loss_ce}
