@@ -81,6 +81,7 @@ class CocoDetection(torch.utils.data.Dataset):
         if self._transforms is not None:
             img, target = self._transforms(img, target)
 
+        print(target['labels'])
         return img, target
 
 
