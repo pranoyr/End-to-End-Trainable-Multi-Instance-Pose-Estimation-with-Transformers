@@ -13,6 +13,7 @@ keypoints = torch.tensor([[[2,2,1],
 
 
 cxcy = keypoints.mean(dim=1)[:,:2] # center of the keypoints   torch.Size([2, 2])
+print(cxcy)
 cxcy_expand = cxcy.clone()
 
 cxcy_expand = torch.repeat_interleave(cxcy_expand.unsqueeze(1) , 4, dim=1)
@@ -39,15 +40,15 @@ print(a.shape)
 
 
 
-import torch
+# import torch
 
-centre = torch.tensor([[2,3], [1,5]])
-print(centre)
+# centre = torch.tensor([[2,3], [1,5]])
+# print(centre)
 
-centre = torch.repeat_interleave(centre.unsqueeze(1), 17, dim=1).view(-1,34)
-print(centre)
+# centre = torch.repeat_interleave(centre.unsqueeze(1), 17, dim=1).view(-1,34)
+# print(centre)
 
-a = torch.ones(1,34)
-b = torch.zeros(1,34)
-c = torch.cat([a,b], dim=0)
-print(centre+ c)
+# a = torch.ones(1,34)
+# b = torch.zeros(1,34)
+# c = torch.cat([a,b], dim=0)
+# print(centre+ c)
