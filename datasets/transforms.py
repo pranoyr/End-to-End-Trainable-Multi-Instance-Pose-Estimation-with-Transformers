@@ -287,6 +287,8 @@ class Normalize(object):
             C = cxcy                                # center of the keypoints  torch.Size([number of persons, 2])
             Z = offsets.view(-1, 2*17)             # offsets of the keypoints torch.Size([number of persons, 17, 2]) --> n,34
             V = keypoints[:,:,2]                    # visibility of the keypoints torch.Size([number of persons, 17])
+            V[V == 2] = 1
+            
 
             C = C / torch.tensor([w, h], dtype=torch.float32)
             Z = Z / torch.tensor([w, h] * 17, dtype = torch.float32)

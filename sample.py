@@ -2,14 +2,14 @@ import numpy as np
 import torch 
 
 keypoints = torch.tensor([[[2,2,1],
-                          [1,4,2],     # 2 person, 4 keypoints, 3 coordinates
-                          [3,2,1],
-                          [1,3,0]],
+						  [1,4,2],     # 2 person, 4 keypoints, 3 coordinates
+						  [3,2,1],
+						  [1,3,0]],
 
-                          [[10,2,1],
-                          [10,11,2],
-                          [4,2,1],
-                          [10,11,0]]], dtype=torch.float32)
+						  [[10,2,1],
+						  [10,11,2],
+						  [4,2,1],
+						  [10,11,0]]], dtype=torch.float32)
 
 
 cxcy = keypoints.mean(dim=1)[:,:2] # center of the keypoints   torch.Size([2, 2])
@@ -37,6 +37,12 @@ print(a.shape)
 # print(cxxy)
 
 # print(offsets)
+
+v = torch.tensor([[1,0,0,2,1,1,0],
+				[1,0,0,2,1,1,0]])
+
+v[v==2]=1
+print(v)
 
 
 
