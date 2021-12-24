@@ -291,7 +291,7 @@ class Normalize(object):
             C = C / torch.tensor([w, h], dtype=torch.float32)
             Z = Z / torch.tensor([w, h] * 17, dtype = torch.float32)
 
-            print(Z)
+            print(V)
     
 
             all_keypoints = torch.cat([C, Z, V], dim=1)  # torch.Size([number of persons, 2+34+17])
