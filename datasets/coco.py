@@ -41,14 +41,13 @@ import datasets.transforms as T
 
 
 class CocoDetection(torch.utils.data.Dataset):
-    def __init__(self, img_folder, ann_file, transforms, return_masks):
+    def __init__(self, root_path, transforms, return_masks):
         super(CocoDetection, self).__init__()
         self._transforms = transforms
         self.prepare = ConvertCocoPolysToMask(return_masks)
 
-        root_path = "/home/neuroplex/code/detr/data/"
-        self.img_folder = root_path + "/train2017/"
-        self.coco=COCO(root_path + "/annotations/person_keypoints_train2017.json")
+        self.img_folder = root_path / "train2017"
+        self.coco=COCO(root_path / "annotations/person_keypoints_train2017.json")
 
         imgIds = sorted(self.coco.getImgIds())
 
@@ -67,7 +66,7 @@ class CocoDetection(torch.utils.data.Dataset):
         target = self.coco.loadAnns(ann_ids)
 
         target = {'image_id': image_id, 'annotations': target}
-        img = Image.open(self.img_folder + self.coco.loadImgs(image_id)[0]['file_name'])
+        img = Image.open(self.img_folder / self.coco.loadImgs(image_id)[0]['file_name'])
         img, target = self.prepare(img, target)
 
         # img = np.array(img)
@@ -214,5 +213,5 @@ def build(image_set, args):
     }
 
     img_folder, ann_file = PATHS[image_set]
-    dataset = CocoDetection(img_folder, ann_file, transforms=make_coco_transforms(image_set), return_masks=args.masks)
+    dataset = CocoDetection(root, transforms=make_coco_transforms(image_set), return_masks=args.masks)
     return dataset
