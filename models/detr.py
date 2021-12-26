@@ -68,7 +68,6 @@ class DETR(nn.Module):
 		# print(self.input_proj(src).shape)
 		hs = self.transformer(self.input_proj(src), mask, self.query_embed.weight, pos[-1])[0]
 
-		print(hs.shape)
 
 		outputs_class = self.class_embed_out(hs)
 		outputs_keypoints = self.pose_embed(hs).sigmoid()	
