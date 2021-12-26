@@ -68,7 +68,7 @@ class DETR(nn.Module):
 		# print(self.input_proj(src).shape)
 		hs = self.transformer(self.input_proj(src), mask, self.query_embed.weight, pos[-1])[0]
 
-		# print(hs.shape)
+		print(hs.shape)
 
 		outputs_class = self.class_embed_out(hs)
 		outputs_keypoints = self.pose_embed(hs).sigmoid()	
@@ -380,7 +380,7 @@ def build(args):
 	if args.masks:
 		model = DETRsegm(model, freeze_detr=(args.frozen_weights is not None))
 	matcher = build_matcher(args)
-	weight_dict = {'loss_ce': 1, 'loss_bbox': args.bbox_loss_coef}
+	weight_dict = {'loss_ce': 10, 'loss_bbox': 10}
 	weight_dict['loss_giou'] = args.giou_loss_coef
 	if args.masks:
 		weight_dict["loss_mask"] = args.mask_loss_coef
