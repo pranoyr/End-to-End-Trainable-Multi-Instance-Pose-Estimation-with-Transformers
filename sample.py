@@ -1,6 +1,8 @@
 import numpy as np
 import torch 
 
+w , h = (100, 100)
+
 keypoints = torch.tensor([[[2,2,1],
 						  [1,4,2],     # 2 person, 4 keypoints, 3 coordinates
 						  [3,2,1],
@@ -12,6 +14,8 @@ keypoints = torch.tensor([[[2,2,1],
 						  [10,11,0]]], dtype=torch.float32)
 
 
+
+
 cxcy = keypoints.mean(dim=1)[:,:2] # center of the keypoints   torch.Size([2, 2])
 print(cxcy)
 cxcy_expand = cxcy.clone()
@@ -21,8 +25,11 @@ cxcy_expand = torch.repeat_interleave(cxcy_expand.unsqueeze(1) , 4, dim=1)
 offsets = keypoints[:,:,:2] - cxcy_expand
 
 C = cxcy
-Z = offsets
+Z = offsets.view(-1, 2*4)
 V = keypoints[:,:,2]
+
+
+
 
 # print(V.unsqueeze(1).repeat_interleave(2, dim=1).shape)
 
@@ -30,23 +37,44 @@ print("C: ", C.shape) #  num_people, 2
 print("Z: ", Z.shape)  # num_people, 17, 2
 print("V: ", V.shape) # num_people, 17
 
-print(V.unsqueeze(2).shape)
-a = Z * V.unsqueeze(2)
-print(a.shape)
+C = C / torch.tensor([w, h], dtype=torch.float32)
+Z = Z / torch.tensor([w, h] * 4, dtype = torch.float32)
+
+all_keypoints = torch.cat([C, Z, V], dim=1)
+all_keypoints = torch.cat([all_keypoints, all_keypoints], dim=0)
+print(all_keypoints.shape)
+
+
+C = all_keypoints[:, :2]
+Z = all_keypoints[:, 2:10]
+V = all_keypoints[:, 10:]
+
+
+C_gt_expand = torch.repeat_interleave(C.unsqueeze(1), 4, dim=1).view(-1,8)
+
+A_gt = C_gt_expand + Z
+A_gt = A_gt * torch.tensor([w, h] * 4, dtype = torch.float32)
+
+print(A_gt.view(-1,4,2))
+
+
+
+
+
+
+
+# print(V.unsqueeze(2).shape)
+# a = Z * V.unsqueeze(2)
+# print(a.shape)
 
 # print(cxxy)
 
 # print(offsets)
 
-v = torch.tensor([[1,0,0,2,1,1,0],
-				[1,0,0,2,1,1,0]])
+# v = torch.tensor([[1,0,0,2,1,1,0,1],
+# 				[1,0,0,2,1,1,0,1]])
 
-v[v==2]=1
-print(v)
-
-
-
-# import torch
+# print(torch.tensor([2,1]*4))
 
 # centre = torch.tensor([[2,3], [1,5]])
 # print(centre)

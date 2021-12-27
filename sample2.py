@@ -49,15 +49,19 @@ print(len(imgIds))
 
 
 
-
+from PIL import Image
 c = 0
 for i in imgIds:
     if cocoGt.getAnnIds(imgIds=i) == []:
         continue
     else:
+        img = Image.open("/home/pranoy/code/detr/data/train2017/"+ cocoGt.loadImgs(i)[0]['file_name'])
         ann_ids = cocoGt.getAnnIds(imgIds=i)
         target = cocoGt.loadAnns(ann_ids)
-        print(cocoGt.loadImgs(i))
+        classes = [obj["category_id"] for obj in target]
+        print(classes)
+        # print(cocoGt.loadImgs(i))
+        # print(target)
         
     c +=1
 

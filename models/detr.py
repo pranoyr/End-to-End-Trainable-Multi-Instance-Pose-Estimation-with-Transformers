@@ -168,16 +168,21 @@ class SetCriterion(nn.Module):
 		# print(src_V.shape)
 
 
-		C_gt = torch.cat([t['keypoints'][i][:, :2] for t, (_, i) in zip(targets, indices)], dim=0)
-		Z_gt = torch.cat([t['keypoints'][i][:, 2:36] for t, (_, i) in zip(targets, indices)], dim=0)
-		V_gt = torch.cat([t['keypoints'][i][:, 36:] for t, (_, i) in zip(targets, indices)], dim=0)
+		# C_gt = torch.cat([t['keypoints'][i][:, :2] for t, (_, i) in zip(targets, indices)], dim=0)
+		# Z_gt = torch.cat([t['keypoints'][i][:, 2:36] for t, (_, i) in zip(targets, indices)], dim=0)
+		# V_gt = torch.cat([t['keypoints'][i][:, 36:] for t, (_, i) in zip(targets, indices)], dim=0)
+
+		targets_keypoints = torch.cat([t['keypoints'][i] for t, (_, i) in zip(targets, indices)], dim=0)
+		C_gt = targets_keypoints[:, :2]
+		Z_gt = targets_keypoints[:, 2:36]
+		V_gt = targets_keypoints[:, 36:]
+
 
 		C_gt_expand = torch.repeat_interleave(C_gt.unsqueeze(1), 17, dim=1).view(-1,34)
 		A_gt = C_gt_expand + Z_gt
 
 		C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
 		A_pred = C_pred_expand + Z_pred
-
 
 
 		# print("t")
