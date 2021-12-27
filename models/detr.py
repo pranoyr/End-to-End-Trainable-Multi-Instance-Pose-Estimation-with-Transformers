@@ -190,18 +190,11 @@ class SetCriterion(nn.Module):
 		# print(target_Z.shape)
 		# print(target_V.shape)
 
-		# Vgt_ = torch.repeat_interleave(V_gt , 2, dim=1)
-		# offset_loss =  F.l1_loss(Vgt_  * Z_pred, Vgt_ * Z_gt, reduction = 'none')
-		# viz_loss  =  F.mse_loss(V_pred, V_gt, reduction = 'none')
-		# center_loss =  F.mse_loss(C_pred , C_gt, reduction='none')
-		# abs_loss = F.l1_loss(Vgt_ * A_pred, Vgt_ * A_gt, reduction='none')
-
 		Vgt_ = torch.repeat_interleave(V_gt , 2, dim=1)
-		offset_loss =  F.l1_loss(Z_pred, Z_gt, reduction = 'none')
+		offset_loss =  F.l1_loss(Vgt_  * Z_pred, Vgt_ * Z_gt, reduction = 'none')
 		viz_loss  =  F.mse_loss(V_pred, V_gt, reduction = 'none')
 		center_loss =  F.mse_loss(C_pred , C_gt, reduction='none')
-		abs_loss = F.l1_loss(A_pred, A_gt, reduction='none')
-
+		abs_loss = F.l1_loss(Vgt_ * A_pred, Vgt_ * A_gt, reduction='none')
 
 
 		# print("centre")
