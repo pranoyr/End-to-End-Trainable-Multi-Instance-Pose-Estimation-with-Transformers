@@ -14,19 +14,29 @@ keypoints = torch.tensor([[[2,2,1],
 						  [10,11,0]]], dtype=torch.float32)
 
 
+v = torch.tensor([[1,0,1,0],
+				[0,1,0,1]], dtype=torch.float32)
 
 
-cxcy = keypoints.mean(dim=1)[:,:2] # center of the keypoints   torch.Size([2, 2])
+keypoints = keypoints[:,:,:2]
+
+cxcy = (keypoints * v.unsqueeze(2)).sum(dim=1) / v.unsqueeze(2).repeat_interleave(2, dim=2).sum(dim=1)
+print(cxcy)
+
+
+
+
+cxcy = keypoints.mean(dim=1)# center of the keypoints   torch.Size([2, 2])
 print(cxcy)
 cxcy_expand = cxcy.clone()
 
 cxcy_expand = torch.repeat_interleave(cxcy_expand.unsqueeze(1) , 4, dim=1)
 
-offsets = keypoints[:,:,:2] - cxcy_expand
+offsets = keypoints - cxcy_expand
 
 C = cxcy
 Z = offsets.view(-1, 2*4)
-V = keypoints[:,:,2]
+V = v
 
 
 

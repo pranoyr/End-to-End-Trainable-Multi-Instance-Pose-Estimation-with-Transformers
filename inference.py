@@ -93,7 +93,7 @@ def detect(im, model, transform):
 
 	# keep only predictions with 0.7+ confidence
 	predictions = outputs['pred_logits'].softmax(-1)[0, :, :-1]
-	keep = predictions.max(-1).values > 0.5
+	keep = predictions.max(-1).values > 0.85
 	keypoints = outputs['pred_keypoints'][0, keep]
 	print(keypoints.shape)
 
@@ -124,7 +124,7 @@ To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("./000000181962.jpg")
+im = Image.open("./000000000241.jpg")
 
 scores, keypoints = detect(im, model, transform)
 
