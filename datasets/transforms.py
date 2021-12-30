@@ -285,7 +285,7 @@ class Normalize(object):
 
 
             # cxcy = keypoints.mean(dim=1)[:,:2] 
-            cxcy = (keypoints * V.unsqueeze(2)).sum(dim=1) / V.unsqueeze(2).repeat_interleave(2, dim=2).sum(dim=1)
+            cxcy = (keypoints[:,:,:2] * V.unsqueeze(2)).sum(dim=1) / V.unsqueeze(2).repeat_interleave(2, dim=2).sum(dim=1)
             cxcy_expand = cxcy.clone()
             cxcy_expand = torch.repeat_interleave(cxcy_expand.unsqueeze(1) , 17, dim=1)
             offsets = keypoints[:,:,:2] - cxcy_expand
