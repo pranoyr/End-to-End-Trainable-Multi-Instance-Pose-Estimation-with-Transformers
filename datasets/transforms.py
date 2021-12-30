@@ -282,6 +282,7 @@ class Normalize(object):
 
             V = keypoints[:,:,2]                    # visibility of the keypoints torch.Size([number of persons, 17])
             V[V == 2] = 1
+            print(V)
             cxcy = (keypoints * V.unsqueeze(2)).sum(dim=1) / V.unsqueeze(2).repeat_interleave(3, dim=2).sum(dim=1)
             cxcy = cxcy[:,:2] 
             # cxcy = keypoints.mean(dim=1)[:,:2] 
