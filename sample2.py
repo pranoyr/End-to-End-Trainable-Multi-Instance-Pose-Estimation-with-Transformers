@@ -58,7 +58,7 @@ for i in imgIds:
         img = Image.open("/home/pranoy/code/detr/data/train2017/"+ cocoGt.loadImgs(i)[0]['file_name'])
         ann_ids = cocoGt.getAnnIds(imgIds=i)
         target = cocoGt.loadAnns(ann_ids)
-        classes = [obj["category_id"] for obj in target]
+        classes = [[obj["category_id"], obj["num_keypoints"]] for obj in target]
         print(classes)
         # print(cocoGt.loadImgs(i))
         # print(target)
