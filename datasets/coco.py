@@ -140,7 +140,7 @@ class ConvertCocoPolysToMask(object):
             keypoints = [obj["keypoints"] for obj in anno]
             keypoints = torch.as_tensor(keypoints, dtype=torch.float32)
             num_keypoints = keypoints.shape[0]
-            if num_keypoints:
+            if num_keypoints and keypoints.sum() != 0:
                 print(num_keypoints)
                 keypoints = keypoints.view(num_keypoints, -1, 3)
 
