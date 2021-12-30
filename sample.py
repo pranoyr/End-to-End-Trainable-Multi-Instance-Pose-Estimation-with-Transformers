@@ -4,39 +4,40 @@ import torch
 w , h = (100, 100)
 
 keypoints = torch.tensor([[[2,2,1],
-						  [1,4,2],     # 2 person, 4 keypoints, 3 coordinates
+						  [1,4,0],     # 2 person, 4 keypoints, 3 coordinates
 						  [3,2,1],
 						  [1,3,0]],
 
-						  [[10,2,1],
-						  [10,11,2],
+						  [[10,2,0],
+						  [10,11,1],
 						  [4,2,1],
-						  [10,11,0]]], dtype=torch.float32)
+						  [10,11,1]]], dtype=torch.float32)
+
+v = keypoints[:,:,2]  
+v[v == 2] = 1
 
 
-v = torch.tensor([[1,0,1,0],
-				[0,1,0,1]], dtype=torch.float32)
 
+# keypoints = keypoints[:,:,:2]
 
-keypoints = keypoints[:,:,:2]
-
-cxcy = (keypoints * v.unsqueeze(2)).sum(dim=1) / v.unsqueeze(2).repeat_interleave(2, dim=2).sum(dim=1)
+cxcy = (keypoints * v.unsqueeze(2)).sum(dim=1) / v.unsqueeze(2).repeat_interleave(3, dim=2).sum(dim=1)
+cxcy = cxcy[:,:2] 
 print(cxcy)
 
 
 
 
-cxcy = keypoints.mean(dim=1)# center of the keypoints   torch.Size([2, 2])
+cxcy = keypoints.mean(dim=1)[:,:2] 
 print(cxcy)
 cxcy_expand = cxcy.clone()
 
 cxcy_expand = torch.repeat_interleave(cxcy_expand.unsqueeze(1) , 4, dim=1)
 
-offsets = keypoints - cxcy_expand
+offsets = keypoints[:,:,:2] - cxcy_expand
 
 C = cxcy
 Z = offsets.view(-1, 2*4)
-V = v
+V = keypoints[:,:,2] 
 
 
 
