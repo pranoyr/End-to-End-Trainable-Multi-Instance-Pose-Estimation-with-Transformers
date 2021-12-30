@@ -140,7 +140,8 @@ class ConvertCocoPolysToMask(object):
             keypoints = [obj["keypoints"] for obj in anno]
             keypoints = torch.as_tensor(keypoints, dtype=torch.float32)
             num_keypoints = keypoints.shape[0]
-            if num_keypoints !=0:
+            if num_keypoints:
+                print(num_keypoints)
                 keypoints = keypoints.view(num_keypoints, -1, 3)
 
         keep = (boxes[:, 3] > boxes[:, 1]) & (boxes[:, 2] > boxes[:, 0])
