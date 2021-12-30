@@ -278,16 +278,17 @@ class Normalize(object):
         
         if "keypoints" in target:
             keypoints = target["keypoints"]  #  (4, 17, 3) (num_person, num_keypoints, 3)
-            
-            V = keypoints[:,:,2]             # visibility of the keypoints torch.Size([number of persons, 17])
+
+
+            V = keypoints[:,:,2]                    # visibility of the keypoints torch.Size([number of persons, 17])
             V[V == 2] = 1
 
-            keypoints = keypoints[:,:,:2]
-            # cxcy = keypoints.mean(dim=1)[:,:2]
+
+            # cxcy = keypoints.mean(dim=1)[:,:2] 
             cxcy = (keypoints * V.unsqueeze(2)).sum(dim=1) / V.unsqueeze(2).repeat_interleave(2, dim=2).sum(dim=1)
             cxcy_expand = cxcy.clone()
             cxcy_expand = torch.repeat_interleave(cxcy_expand.unsqueeze(1) , 17, dim=1)
-            offsets = keypoints - cxcy_expand
+            offsets = keypoints[:,:,:2] - cxcy_expand
 
             C = cxcy                                # center of the keypoints  torch.Size([number of persons, 2])
             Z = offsets.view(-1, 2*17)             # offsets of the keypoints torch.Size([number of persons, 17, 2]) --> n,34
@@ -298,9 +299,6 @@ class Normalize(object):
             C = C / torch.tensor([w, h], dtype=torch.float32)
             Z = Z / torch.tensor([w, h] * 17, dtype = torch.float32)
 
-
-
-            print(C.shape, Z.shape, V.shape)
 
             all_keypoints = torch.cat([C, Z, V], dim=1)  # torch.Size([number of persons, 2+34+17])
             target["keypoints"] = all_keypoints 
