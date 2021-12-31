@@ -113,6 +113,7 @@ class HungarianMatcher(nn.Module):
         # The 1 is a constant that doesn't change the matching, it can be ommitted.
         
         cost_class = -out_prob[:, tgt_ids]
+        print(cost_class.shape)
 
         
         Vgt_ = torch.repeat_interleave(V_gt , 2, dim=1)
