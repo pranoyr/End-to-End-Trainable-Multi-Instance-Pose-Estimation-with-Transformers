@@ -77,6 +77,7 @@ class HungarianMatcher(nn.Module):
         
         print("****")
         print(tgt_keypoints.shape)
+        print(out_keypoints.shape)
         C_gt = tgt_keypoints[:, :2]
         Z_gt = tgt_keypoints[:, 2:36]
         V_gt = tgt_keypoints[:, 36:]
