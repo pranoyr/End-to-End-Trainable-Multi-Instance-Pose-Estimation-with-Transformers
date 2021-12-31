@@ -50,17 +50,17 @@ def crop(image, target, region):
         fields.append("masks")
 
     # remove elements for which the boxes or masks that have zero area
-    if "boxes" in target or "masks" in target:
-        # favor boxes selection when defining which elements to keep
-        # this is compatible with previous implementation
-        if "boxes" in target:
-            cropped_boxes = target['boxes'].reshape(-1, 2, 2)
-            keep = torch.all(cropped_boxes[:, 1, :] > cropped_boxes[:, 0, :], dim=1)
-        else:
-            keep = target['masks'].flatten(1).any(1)
+    # if "boxes" in target or "masks" in target:
+    #     # favor boxes selection when defining which elements to keep
+    #     # this is compatible with previous implementation
+    #     if "boxes" in target:
+    #         cropped_boxes = target['boxes'].reshape(-1, 2, 2)
+    #         keep = torch.all(cropped_boxes[:, 1, :] > cropped_boxes[:, 0, :], dim=1)
+    #     else:
+    #         keep = target['masks'].flatten(1).any(1)
 
-        for field in fields:
-            target[field] = target[field][keep]
+    #     for field in fields:
+    #         target[field] = target[field][keep]
 
     return cropped_image, target
 
