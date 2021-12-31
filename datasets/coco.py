@@ -129,6 +129,7 @@ class ConvertCocoPolysToMask(object):
         boxes[:, 1::2].clamp_(min=0, max=h)
 
         classes = [obj["category_id"] for obj in anno]
+        print(classes)
         classes = torch.tensor(classes, dtype=torch.int64)
 
         if self.return_masks:
@@ -206,7 +207,7 @@ def make_coco_transforms(image_set):
                 T.RandomResize(scales, max_size=1333),
                
                     T.RandomResize([400, 500, 600]),
-                    # T.RandomSizeCrop(384, 600),
+                    T.RandomSizeCrop(384, 600),
                     T.RandomResize(scales, max_size=1333),
                 
            

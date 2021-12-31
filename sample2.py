@@ -49,20 +49,30 @@ print(len(imgIds))
 
 
 
-from PIL import Image
-c = 0
-for i in imgIds:
-    if cocoGt.getAnnIds(imgIds=i) == []:
-        continue
-    else:
-        img = Image.open("/home/pranoy/code/detr/data/train2017/"+ cocoGt.loadImgs(i)[0]['file_name'])
-        ann_ids = cocoGt.getAnnIds(imgIds=i)
-        target = cocoGt.loadAnns(ann_ids)
-        classes = [[obj["category_id"], obj["num_keypoints"]] for obj in target]
-        print(classes)
-        # print(cocoGt.loadImgs(i))
-        # print(target)
+# from PIL import Image
+# c = 0
+# for i in imgIds:
+#     if cocoGt.getAnnIds(imgIds=i) == []:
+#         continue
+#     else:
+#         img = Image.open("/home/pranoy/code/detr/data/train2017/"+ cocoGt.loadImgs(i)[0]['file_name'])
+#         ann_ids = cocoGt.getAnnIds(imgIds=i)
+#         target = cocoGt.loadAnns(ann_ids)
+#         classes = [[obj["category_id"], obj["num_keypoints"]] for obj in target]
+#         print(classes)
+#         # print(cocoGt.loadImgs(i))
+#         # print(target)
         
-    c +=1
+#     c +=1
 
-print(c)
+# print(c)
+
+
+import fiftyone
+dataset = fiftyone.zoo.load_zoo_dataset(
+    "coco-2017",
+    split="train",
+    label_types=["keypoints"],
+    classes=["person"],
+    max_samples=200000,
+)
