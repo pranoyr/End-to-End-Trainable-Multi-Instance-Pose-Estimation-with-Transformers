@@ -52,10 +52,18 @@ class CocoDetection(torch.utils.data.Dataset):
         imgIds = sorted(self.coco.getImgIds())
 
         self.all_imgIds = []
-        for i in imgIds:
-            if self.coco.getAnnIds(imgIds=i) == []:
+        for image_id in imgIds:
+            if self.coco.getAnnIds(imgIds=image_id) == []:
                 continue
-            self.all_imgIds.append(i)
+      
+            ann_ids = self.coco.getAnnIds(imgIds=image_id)
+            target = self.coco.loadAnns(ann_ids)
+            num_keypoints = [obj["num_keypoints"] for obj in target]
+            if sum(num_keypoints) == 0:
+                continue
+
+            self.all_imgIds.append(image_id)
+            
 
     def __len__(self):
         return len(self.all_imgIds)
@@ -137,10 +145,11 @@ class ConvertCocoPolysToMask(object):
 
         keypoints = None
         if anno and "keypoints" in anno[0]:
-            keypoints = [obj["keypoints"] for obj in anno]
+            # keypoints = [obj["keypoints"] for obj in anno]
+            keypoints = [obj["keypoints"] for obj in anno if obj["num_keypoints"]!=0]
             keypoints = torch.as_tensor(keypoints, dtype=torch.float32)
             num_keypoints = keypoints.shape[0]
-            if num_keypoints and keypoints.sum() != 0:
+            if num_keypoints:
                 # print(num_keypoints)
                 keypoints = keypoints.view(num_keypoints, -1, 3)
                 # print(keypoints)
