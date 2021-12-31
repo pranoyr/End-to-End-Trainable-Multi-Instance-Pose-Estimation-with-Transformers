@@ -129,7 +129,6 @@ class ConvertCocoPolysToMask(object):
         boxes[:, 1::2].clamp_(min=0, max=h)
 
         classes = [obj["category_id"] for obj in anno]
-        print(classes)
         classes = torch.tensor(classes, dtype=torch.int64)
 
         if self.return_masks:
@@ -142,8 +141,9 @@ class ConvertCocoPolysToMask(object):
             keypoints = torch.as_tensor(keypoints, dtype=torch.float32)
             num_keypoints = keypoints.shape[0]
             if num_keypoints and keypoints.sum() != 0:
-                print(num_keypoints)
+                # print(num_keypoints)
                 keypoints = keypoints.view(num_keypoints, -1, 3)
+                # print(keypoints)
 
         keep = (boxes[:, 3] > boxes[:, 1]) & (boxes[:, 2] > boxes[:, 0])
         boxes = boxes[keep]
@@ -152,7 +152,6 @@ class ConvertCocoPolysToMask(object):
             masks = masks[keep]
         if keypoints is not None:
             keypoints = keypoints[keep]
-        print(keypoints)
 
         target = {}
         target["boxes"] = boxes
@@ -184,36 +183,19 @@ def make_coco_transforms(image_set):
 
     scales = [480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
 
-    # if image_set == 'train':
-    #     return T.Compose([
-    #         T.RandomHorizontalFlip(),
-    #         T.RandomSelect(
-    #             T.RandomResize(scales, max_size=1333),
-    #             T.Compose([
-    #                 T.RandomResize([400, 500, 600]),
-    #                 T.RandomSizeCrop(384, 600),
-    #                 T.RandomResize(scales, max_size=1333),
-    #             ])
-    #         ),
-    #         normalize,
-    #     ])
-
-
-
     if image_set == 'train':
         return T.Compose([
             T.RandomHorizontalFlip(),
-           
+            T.RandomSelect(
                 T.RandomResize(scales, max_size=1333),
-               
+                T.Compose([
                     T.RandomResize([400, 500, 600]),
                     T.RandomSizeCrop(384, 600),
                     T.RandomResize(scales, max_size=1333),
-                
-           
-                     normalize,
+                ])
+            ),
+            normalize,
         ])
-
 
     if image_set == 'val':
         return T.Compose([
