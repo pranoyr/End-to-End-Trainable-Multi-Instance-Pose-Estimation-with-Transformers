@@ -143,7 +143,6 @@ class ConvertCocoPolysToMask(object):
             if num_keypoints and keypoints.sum() != 0:
                 print(num_keypoints)
                 keypoints = keypoints.view(num_keypoints, -1, 3)
-                print(keypoints)
 
         keep = (boxes[:, 3] > boxes[:, 1]) & (boxes[:, 2] > boxes[:, 0])
         boxes = boxes[keep]
@@ -152,6 +151,7 @@ class ConvertCocoPolysToMask(object):
             masks = masks[keep]
         if keypoints is not None:
             keypoints = keypoints[keep]
+        print(keypoints)
 
         target = {}
         target["boxes"] = boxes
