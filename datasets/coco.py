@@ -159,8 +159,8 @@ class ConvertCocoPolysToMask(object):
         classes = classes[keep]
         if self.return_masks:
             masks = masks[keep]
-        if keypoints is not None:
-            keypoints = keypoints[keep]
+        # if keypoints is not None:
+        #     keypoints = keypoints[keep]
 
         target = {}
         target["boxes"] = boxes
