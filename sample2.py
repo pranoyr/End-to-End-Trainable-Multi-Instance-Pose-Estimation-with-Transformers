@@ -32,16 +32,16 @@ import numpy as np
 import skimage.io as io
 import pylab
 
-prefix = 'person_keypoints'
+# prefix = 'person_keypoints'
 
-#initialize COCO ground truth api
-dataDir='../'
-dataType='train2017'
-annFile = "/home/pranoy/code/detr/data/annotations/person_keypoints_train2017.json"
-cocoGt=COCO(annFile)
+# #initialize COCO ground truth api
+# dataDir='../'
+# dataType='train2017'
+# annFile = "/home/pranoy/code/detr/data/annotations/person_keypoints_train2017.json"
+# cocoGt=COCO(annFile)
 
-imgIds=sorted(cocoGt.getImgIds())
-print(len(imgIds))
+# imgIds=sorted(cocoGt.getImgIds())
+# print(len(imgIds))
 
 # ann_ids = cocoGt.getAnnIds(imgIds=5)
 # print(ann_ids)
