@@ -37,7 +37,8 @@ import pylab
 #initialize COCO ground truth api
 dataDir='../'
 dataType='train2017'
-annFile = "/home/pranoy/fiftyone/coco-2017/raw/person_keypoints_train2017.json"
+# annFile = "/home/pranoy/fiftyone/coco-2017/raw/person_keypoints_train2017.json"
+annFile = "/home/pranoy/code/detr/data/annotations/person_keypoints_train2017.json"
 cocoGt=COCO(annFile)
 
 imgIds=sorted(cocoGt.getImgIds())
@@ -54,18 +55,16 @@ c = 0
 for i in imgIds:
     if cocoGt.getAnnIds(imgIds=i) == []:
         continue
-    else:
-        img = Image.open("/home/pranoy/fiftyone/coco-2017/train/data/"+ cocoGt.loadImgs(i)[0]['file_name'])
-        ann_ids = cocoGt.getAnnIds(imgIds=i)
-        target = cocoGt.loadAnns(ann_ids)
-        num_keypoints = [obj["num_keypoints"] for obj in target]
-        print(num_keypoints)
-        print(cocoGt.loadImgs(i)[0]['file_name'])
-        # if sum(num_keypoints) == 0:
-        #     print(cocoGt.loadImgs(i)[0]['file_name'])
-        # print(cocoGt.loadImgs(i))
-        # print(target)
+    # img = Image.open("/home/pranoy/fiftyone/coco-2017/train/data/"+ cocoGt.loadImgs(i)[0]['file_name'])
+    img = Image.open("/home/pranoy/code/detr/data/train2017/"+ cocoGt.loadImgs(i)[0]['file_name'])
+    ann_ids = cocoGt.getAnnIds(imgIds=i)
+    target = cocoGt.loadAnns(ann_ids)
+    num_keypoints = [obj["num_keypoints"] for obj in target]
+    
+    if sum(num_keypoints) == 0:
+            continue
         
-    c +=1
+      
+    print(num_keypoints)
 
 print(c)
