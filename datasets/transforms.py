@@ -279,7 +279,6 @@ class Normalize(object):
         if "keypoints" in target:
             keypoints = target["keypoints"]  #  (4, 17, 3) (num_person, num_keypoints, 3)
             
-            print(keypoints)
             V = keypoints[:,:,2]                    # visibility of the keypoints torch.Size([number of persons, 17])
             V[V == 2] = 1
             print(V)
