@@ -36,7 +36,7 @@ def crop(image, target, region):
         fields.append("boxes")
     
     if "keypoints" in target:
-        max_size = torch.as_tensor([w, h, 0], dtype=torch.float32)
+        max_size = torch.as_tensor([w, h, 2], dtype=torch.float32)
         keypoints = target["keypoints"]
         cropped_keypoints = keypoints.view(-1, 3) - torch.as_tensor([j, i, 0])
         cropped_keypoints = torch.min(cropped_keypoints, max_size)
