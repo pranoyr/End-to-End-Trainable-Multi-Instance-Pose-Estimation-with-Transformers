@@ -181,8 +181,7 @@ class ConvertCocoPolysToMask(object):
         target["size"] = torch.as_tensor([int(h), int(w)])
 
         del target['boxes']
-        del target['masks']
-
+ 
         return image, target
 
 
