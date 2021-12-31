@@ -75,8 +75,8 @@ class HungarianMatcher(nn.Module):
         # print(len(targets))
         tgt_keypoints = torch.cat([v["keypoints"] for v in targets])
         
-        # print("****")
-        # print(tgt_keypoints.shape)
+        print("****")
+        print(tgt_keypoints.shape)
         C_gt = tgt_keypoints[:, :2]
         Z_gt = tgt_keypoints[:, 2:36]
         V_gt = tgt_keypoints[:, 36:]
