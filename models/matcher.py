@@ -75,10 +75,8 @@ class HungarianMatcher(nn.Module):
         # print(len(targets))
         tgt_keypoints = torch.cat([v["keypoints"] for v in targets])
         
-        print("****")
-        print(tgt_keypoints.shape)
-        print(tgt_ids.shape)
-        print(out_keypoints.shape)
+        # print("****")
+        # print(tgt_keypoints.shape)
         C_gt = tgt_keypoints[:, :2]
         Z_gt = tgt_keypoints[:, 2:36]
         V_gt = tgt_keypoints[:, 36:]
@@ -114,7 +112,7 @@ class HungarianMatcher(nn.Module):
         # The 1 is a constant that doesn't change the matching, it can be ommitted.
         
         cost_class = -out_prob[:, tgt_ids]
-        
+
         
         Vgt_ = torch.repeat_interleave(V_gt , 2, dim=1)
 
