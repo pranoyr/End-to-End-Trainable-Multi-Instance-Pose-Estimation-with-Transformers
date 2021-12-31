@@ -301,6 +301,7 @@ class Normalize(object):
 
             all_keypoints = torch.cat([C, Z, V], dim=1)  # torch.Size([number of persons, 2+34+17])
             print(all_keypoints)
+            print(all_keypoints.shape)
             target["keypoints"] = all_keypoints 
         return image, target
 
