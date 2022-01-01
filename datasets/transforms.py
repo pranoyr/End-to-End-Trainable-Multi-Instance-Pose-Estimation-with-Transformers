@@ -41,7 +41,7 @@ def crop(image, target, region):
         cropped_keypoints = keypoints.view(-1, 3)[:,:2] - torch.as_tensor([j, i])
         cropped_keypoints = torch.min(cropped_keypoints, max_size)
         cropped_keypoints = cropped_keypoints.clamp(min=0)
-        cropped_keypoints = torch.cat([cropped_keypoints, keypoints.view(-1, 3)[:, :2]], dim=1)
+        cropped_keypoints = torch.cat([cropped_keypoints, keypoints.view(-1, 3)[:,2]], dim=1)
         target["keypoints"] = cropped_keypoints.view(target["keypoints"].shape[0], 17, 3)
         fields.append("keypoints")
 
