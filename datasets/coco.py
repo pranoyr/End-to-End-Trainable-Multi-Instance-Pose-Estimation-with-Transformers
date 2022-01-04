@@ -36,8 +36,22 @@ import datasets.transforms as T
 #         if self._transforms is not None:
 #             img, target = self._transforms(img, target)
 #         return img, target
-
-
+# scales = [480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
+# transforms_ = T.Compose([
+#             T.RandomHorizontalFlip(),
+#             T.RandomSelect(
+#                 T.Compose([
+#                 T.Rotate(0.5, [-25, 25]),
+#                 T.RandomResize(scales, max_size=1333),
+#                 ]),
+#                 T.Compose([
+#                     T.RandomResize([400, 500, 600]),
+#                     T.RandomSizeCrop(384, 600),
+#                     T.RandomResize(scales, max_size=1333),
+#                 ])
+#             ),
+#            # normalize,
+#         ])
 
 
 class CocoDetection(torch.utils.data.Dataset):
@@ -77,18 +91,21 @@ class CocoDetection(torch.utils.data.Dataset):
         img = Image.open(self.img_folder / self.coco.loadImgs(image_id)[0]['file_name'])
         img, target = self.prepare(img, target)
 
-        # img = np.array(img)
-        # cv2.imwrite("a.jpg", img)
-        # for person in target['keypoints']:
+        # # debugging
+        # img_, target_ = transforms_(img, target)
+        # img_ = np.array(img_)
+        # cv2.imwrite("a.jpg", img_)
+        # for person in target_['keypoints']:
         #     for keypoint in person:
         #         keypoint = keypoint.type(torch.int32)
-        #         cv2.circle(img, (keypoint[0].item(), keypoint[1].item()), 1, (0, 0, 255), -1)
-        # cv2.imwrite("b.jpg", img)
+        #         cv2.circle(img_, (keypoint[0].item(), keypoint[1].item()), 1, (0, 0, 255), -1)
+        # cv2.imwrite("b.jpg", img_)
 
         if self._transforms is not None:
             img, target = self._transforms(img, target)
         target["labels"] = target["labels"] - 1
 
+       
         return img, target
 
 
@@ -214,8 +231,10 @@ def make_coco_transforms(image_set):
         return T.Compose([
             T.RandomHorizontalFlip(),
             T.RandomSelect(
-                T.Rotate(0.5, (-25, 25)),
+                T.Compose([
+                T.Rotate(0.5, [-25, 25]),
                 T.RandomResize(scales, max_size=1333),
+                ]),
                 T.Compose([
                     T.RandomResize([400, 500, 600]),
                     T.RandomSizeCrop(384, 600),

@@ -99,12 +99,13 @@ def rotate(image, target, angle):
     target = target.copy()
     
     if "keypoints" in target:
-        keypoints_o = target["keypoints"][:,:,:2].view(-1,2) # num_keypoints, 2
+        keypoints = target["keypoints"][:,:,:2].view(-1,2) # num_keypoints, 2
         matrix = cv2.getRotationMatrix2D(((w - 1) * 0.5, (h - 1) * 0.5), angle, 1.0)
 
-        keypoints = [torch.from_numpy(cv2.transform(np.array([[[keypoint[0], keypoint[1]]]]), matrix).squeeze()) for keypoint in keypoints_o]
-        keypoints = torch.cat(keypoints, dim=0)
-        keypoints = torch.cat(keypoints, keypoints_o[:,:,2].unsqueeze(1), dim=1).view(-1,17,3)
+        keypoints = [torch.from_numpy(cv2.transform(np.array([[[keypoint[0], keypoint[1]]]]), matrix).squeeze()) for keypoint in keypoints]
+        keypoints = torch.stack(keypoints, dim=0)
+        v =  target["keypoints"].view(-1,3)[:,2].unsqueeze(1)
+        keypoints = torch.cat([keypoints, v], dim=1).view(-1,17,3)
       
         target["keypoints"] = keypoints
 
