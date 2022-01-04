@@ -104,7 +104,7 @@ def detect(im, model, transform):
 
 	C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
 	A_pred = C_pred_expand + Z_pred # torch.size([num_persons, 34])
-	print(A_pred.shape)
+	#A_pred = A_pred[torch.repeat_interleave(V_pred, 2, dim=1) > 0].view(-1,34)
 
 	# rescale bounding boxes to absolute image coordinates
 	w, h = im.size

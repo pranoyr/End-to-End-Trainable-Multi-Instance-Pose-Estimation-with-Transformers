@@ -63,8 +63,9 @@ for i in imgIds:
     
     if sum(num_keypoints) == 0:
             continue
-        
-      
+    
+    print(cocoGt.loadImgs(i)[0]['file_name'])
     print(num_keypoints)
+
 
 print(c)

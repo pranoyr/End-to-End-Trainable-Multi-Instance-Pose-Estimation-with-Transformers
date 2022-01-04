@@ -6,10 +6,10 @@ w , h = (100, 100)
 keypoints = torch.tensor([[[2,2,1],
 						  [1,4,0],     # 2 person, 4 keypoints, 3 coordinates
 						  [3,2,1],
-						  [1,3,0]],
+						  [1,3,1]],
 
 						  [[10,2,0],
-						  [10,11,1],
+						  [10,11,2],
 						  [4,2,1],
 						  [10,11,1]]], dtype=torch.float32)
 

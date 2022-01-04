@@ -6,6 +6,8 @@ import random
 
 import PIL
 import torch
+import cv2
+import numpy as np
 import torchvision.transforms as T
 import torchvision.transforms.functional as F
 
@@ -87,6 +89,28 @@ def hflip(image, target):
         target['masks'] = target['masks'].flip(-1)
 
     return flipped_image, target
+
+
+
+def rotate(image, target, angle):
+    flipped_image = F.rotate(image, angle)
+
+    w, h = image.size
+    target = target.copy()
+    
+    if "keypoints" in target:
+        keypoints_o = target["keypoints"][:,:,:2].view(-1,2) # num_keypoints, 2
+        matrix = cv2.getRotationMatrix2D(((w - 1) * 0.5, (h - 1) * 0.5), angle, 1.0)
+
+        keypoints = [torch.from_numpy(cv2.transform(np.array([[[keypoint[0], keypoint[1]]]]), matrix).squeeze()) for keypoint in keypoints_o]
+        keypoints = torch.cat(keypoints, dim=0)
+        keypoints = torch.cat(keypoints, keypoints_o[:,:,2].unsqueeze(1), dim=1).view(-1,17,3)
+      
+        target["keypoints"] = keypoints
+
+
+    return flipped_image, target
+
 
 
 def resize(image, target, size, max_size=None):
@@ -206,6 +230,18 @@ class RandomHorizontalFlip(object):
     def __call__(self, img, target):
         if random.random() < self.p:
             return hflip(img, target)
+        return img, target
+
+
+
+class Rotate(object):
+    def __init__(self, p=0.5, limit=[-25,25]):
+        self.limit = limit
+        self.p = p
+    def __call__(self, img, target):
+        if random.random() < self.p:
+            angle = random.uniform(self.limit[0], self.limit[1])
+            return rotate(img, target, angle)
         return img, target
 
 
