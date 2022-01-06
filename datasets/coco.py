@@ -91,15 +91,6 @@ class CocoDetection(torch.utils.data.Dataset):
         img = Image.open(self.img_folder / self.coco.loadImgs(image_id)[0]['file_name'])
         img, target = self.prepare(img, target)
 
-        # # debugging
-        # img_, target_ = transforms_(img, target)
-        # img_ = np.array(img_)
-        # cv2.imwrite("a.jpg", img_)
-        # for person in target_['keypoints']:
-        #     for keypoint in person:
-        #         keypoint = keypoint.type(torch.int32)
-        #         cv2.circle(img_, (keypoint[0].item(), keypoint[1].item()), 1, (0, 0, 255), -1)
-        # cv2.imwrite("b.jpg", img_)
 
         if self._transforms is not None:
             img, target = self._transforms(img, target)
@@ -170,7 +161,7 @@ class ConvertCocoPolysToMask(object):
 
         keep = (boxes[:, 3] > boxes[:, 1]) & (boxes[:, 2] > boxes[:, 0])
         boxes = boxes[keep]
-        
+
         if self.return_masks:
             masks = masks[keep]
 
