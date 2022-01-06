@@ -316,26 +316,24 @@ class Normalize(object):
         
         if "keypoints" in target:
             keypoints = target["keypoints"]  #  (4, 17, 3) (num_person, num_keypoints, 3)
-            # print(keypoints)
-            V = keypoints[:,:,2]                    # visibility of the keypoints torch.Size([number of persons, 17])
+         
+            V = keypoints[:,:,2]        # visibility of the keypoints torch.Size([number of persons, 17])
             V[V == 2] = 1
-            # print(V)
+
+            # get centers of keypoints
             cxcy = (keypoints * V.unsqueeze(2)).sum(dim=1) / V.unsqueeze(2).repeat_interleave(3, dim=2).sum(dim=1)
             cxcy = cxcy[:,:2] 
-            # cxcy = keypoints.mean(dim=1)[:,:2] 
+           
+            # get the distance between the center of the keypoints and the center of the image
             cxcy_expand = cxcy.clone()
             cxcy_expand = torch.repeat_interleave(cxcy_expand.unsqueeze(1) , 17, dim=1)
             offsets = keypoints[:,:,:2] - cxcy_expand
 
             C = cxcy                                # center of the keypoints  torch.Size([number of persons, 2])
             Z = offsets.view(-1, 2*17)             # offsets of the keypoints torch.Size([number of persons, 17, 2]) --> n,34
-            # V = keypoints[:,:,2]                    # visibility of the keypoints torch.Size([number of persons, 17])
-            # V[V == 2] = 1
-            
 
             C = C / torch.tensor([w, h], dtype=torch.float32)
             Z = Z / torch.tensor([w, h] * 17, dtype = torch.float32)
-
 
             all_keypoints = torch.cat([C, Z, V], dim=1)  # torch.Size([number of persons, 2+34+17])
             target["keypoints"] = all_keypoints 

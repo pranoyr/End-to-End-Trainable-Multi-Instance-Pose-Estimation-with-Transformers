@@ -162,22 +162,17 @@ class ConvertCocoPolysToMask(object):
 
         keypoints = None
         if anno and "keypoints" in anno[0]:
-            # keypoints = [obj["keypoints"] for obj in anno]
             keypoints = [obj["keypoints"] for obj in anno if obj["num_keypoints"]!=0]
             keypoints = torch.as_tensor(keypoints, dtype=torch.float32)
             num_keypoints = keypoints.shape[0]
             if num_keypoints:
-                # print(num_keypoints)
                 keypoints = keypoints.view(num_keypoints, -1, 3)
-                # print(keypoints)
 
         keep = (boxes[:, 3] > boxes[:, 1]) & (boxes[:, 2] > boxes[:, 0])
         boxes = boxes[keep]
-        # classes = classes[keep]
+        
         if self.return_masks:
             masks = masks[keep]
-        # if keypoints is not None:
-        #     keypoints = keypoints[keep]
 
         target = {}
         target["boxes"] = boxes
@@ -211,22 +206,7 @@ def make_coco_transforms(image_set):
 
     scales = [480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
 
-    # if image_set == 'train':
-    #     return T.Compose([
-    #         T.RandomHorizontalFlip(),
-    #         T.RandomSelect(
-    #             T.RandomResize(scales, max_size=1333),
-    #             T.Compose([
-    #                 T.RandomResize([400, 500, 600]),
-    #                 T.RandomSizeCrop(384, 600),
-    #                 T.RandomResize(scales, max_size=1333),
-    #             ])
-    #         ),
-    #         normalize,
-    #     ])
-
-
-
+  
     if image_set == 'train':
         return T.Compose([
             T.RandomHorizontalFlip(),

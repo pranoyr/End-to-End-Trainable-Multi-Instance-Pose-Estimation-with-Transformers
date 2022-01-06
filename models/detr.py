@@ -163,54 +163,29 @@ class SetCriterion(nn.Module):
 		C_pred = src_boxes[:, :2]
 		Z_pred = src_boxes[:, 2:36]
 		V_pred = src_boxes[:, 36:]
-		# print(src_C.shape)
-		# print(src_Z.shape)
-		# print(src_V.shape)
-
-
-		# C_gt = torch.cat([t['keypoints'][i][:, :2] for t, (_, i) in zip(targets, indices)], dim=0)
-		# Z_gt = torch.cat([t['keypoints'][i][:, 2:36] for t, (_, i) in zip(targets, indices)], dim=0)
-		# V_gt = torch.cat([t['keypoints'][i][:, 36:] for t, (_, i) in zip(targets, indices)], dim=0)
-
+	
 		targets_keypoints = torch.cat([t['keypoints'][i] for t, (_, i) in zip(targets, indices)], dim=0)
 		C_gt = targets_keypoints[:, :2]
 		Z_gt = targets_keypoints[:, 2:36]
 		V_gt = targets_keypoints[:, 36:]
 
-
 		C_gt_expand = torch.repeat_interleave(C_gt.unsqueeze(1), 17, dim=1).view(-1,34)
 		A_gt = C_gt_expand + Z_gt
-
 		C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
 		A_pred = C_pred_expand + Z_pred
 
-
-		# print("t")
-		# print(target_C.shape)
-		# print(target_Z.shape)
-		# print(target_V.shape)
-
+		# Compute the L1 and L2 regression loss
 		Vgt_ = torch.repeat_interleave(V_gt , 2, dim=1)
 		offset_loss =  F.l1_loss(Vgt_  * Z_pred, Vgt_ * Z_gt, reduction = 'none')
 		viz_loss  =  F.mse_loss(V_pred, V_gt, reduction = 'none')
 		center_loss =  F.mse_loss(C_pred , C_gt, reduction='none')
 		abs_loss = F.l1_loss(Vgt_ * A_pred, Vgt_ * A_gt, reduction='none')
 
-
-		# print("centre")
-		# print(center_loss.shape)
-		#
-		# loss_bbox = F.l1_loss(src_boxes, target_boxes, reduction='none')
-
 		total_keypoints_loss = self.l_deltas * torch.sum(offset_loss) + self.l_vis *  torch.sum(viz_loss) + self.l_ctr *  torch.sum(center_loss) + self.l_abs * torch.sum(abs_loss)
 
 		losses = {}
-		losses['loss_bbox'] = total_keypoints_loss / num_boxes
+		losses['loss_keypoints'] = total_keypoints_loss / num_boxes
 
-		# loss_giou = 1 - torch.diag(box_ops.generalized_box_iou(
-		# 	box_ops.box_cxcywh_to_xyxy(src_boxes),
-		# 	box_ops.box_cxcywh_to_xyxy(target_boxes)))
-		# losses['loss_giou'] = loss_giou.sum() / num_boxes
 		return losses
 
 	def loss_masks(self, outputs, targets, indices, num_boxes):
