@@ -93,7 +93,7 @@ def detect(im, model, transform):
 
 	# keep only predictions with 0.7+ confidence
 	predictions = outputs['pred_logits'].softmax(-1)[0, :, :-1]
-	keep = predictions.max(-1).values > 0.85
+	keep = predictions.max(-1).values > 0.5
 	keypoints = outputs['pred_keypoints'][0, keep]
 	print(keypoints.shape)
 
