@@ -1,7 +1,6 @@
 import torch
 
+from models.resnet.resnet50 import Resnet1
 
-a = torch.tensor([[1,2,3], 
-                [5,6,7]])
-
-print(a[:,:2])
+model = Resnet1(50, out_indices=(0, 1, 2, 3))
+print(model)
