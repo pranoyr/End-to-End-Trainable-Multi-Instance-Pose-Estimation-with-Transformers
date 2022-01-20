@@ -58,7 +58,7 @@ COLORS = [[0.000, 0.447, 0.741], [0.850, 0.325, 0.098], [0.929, 0.694, 0.125],
 
 # standard PyTorch mean-std input image normalization
 transform = T.Compose([
-	T.Resize(800),
+	T.Resize(800, max_size=1333),
 	T.ToTensor(),
 	T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
@@ -102,9 +102,10 @@ def detect(im, model, transform):
 	Z_pred = keypoints[:, 2:36] # shape (N, 34)
 	V_pred = keypoints[:, 36:] 	# shape (N, 17)
 
+	V_pred = torch.repeat_interleave(V_pred, 2, dim=1)
 	C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
 	A_pred = C_pred_expand + Z_pred # torch.size([num_persons, 34])
-	#A_pred = A_pred[torch.repeat_interleave(V_pred, 2, dim=1) > 0].view(-1,34)
+	A_pred[V_pred < 0.5] = -1
 
 	# rescale bounding boxes to absolute image coordinates
 	w, h = im.size
@@ -112,11 +113,6 @@ def detect(im, model, transform):
 	keypoints_scaled = A_pred.view(-1, 17, 2)
 	print(keypoints_scaled.shape)
 	
-
-	# print(predictions.shape)
-	# print(predictions[keep])
-	# print(keypoints.shape)
-
 	return  predictions[keep] , keypoints_scaled.type(torch.int32)
 
 """## Using DETR
@@ -131,27 +127,26 @@ scores, keypoints = detect(im, model, transform)
 """Let's now visualize the model predictions"""
 
 def plot_results(pil_img, scores, keypoints):
-	# plt.figure(figsize=(16,10))
-	# plt.imshow(pil_img)
-	# ax = plt.gca()
+
 	img = np.array(pil_img)
 	
 
 	for s, keypoints, c in zip(scores, keypoints.tolist(), COLORS * 100):
-		# ax.add_patch(plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin,
-		# 						   fill=False, color=c, linewidth=3))
 		cls_ = s.argmax()
-		# text = f'{CLASSES[cl]}: {p[cl]:0.2f}'
 		text = "person"
 		print(text)
 
 		for joint in keypoints:
-			cv2.circle(img, (joint[0], joint[1]), 2, (255,0,0), -1)
+			if joint[0] >= 0 and joint[1] >= 0:
+				cv2.circle(img, (joint[0], joint[1]), 2, (255,0,0), -1)
 
-		# ax.text(xmin, ymin, text, fontsize=15,
-	# 	# 		bbox=dict(facecolor='yellow', alpha=0.5))
-	# plt.axis('off')
-	# plt.show()
+		# draw neck
+		x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, keypoints[5][1]
+		cv2.circle(img, (int(x), int(y)), 2, (0,255,0), -1)
+		
+		# draw neck
+		x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, keypoints[5][1]
+		cv2.circle(img, (int(x), int(y)), 2, (0,255,0), -1)
+
 	cv2.imwrite("./image.jpg", cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
-	# cv2.waitKey(0)
 plot_results(im, scores, keypoints)

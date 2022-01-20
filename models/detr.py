@@ -64,15 +64,12 @@ class DETR(nn.Module):
 
 		src, mask = features[-1].decompose()
 		assert mask is not None
-		# print("input")
-		# print(self.input_proj(src).shape)
+	
 		hs = self.transformer(self.input_proj(src), mask, self.query_embed.weight, pos[-1])[0]
-
 
 		outputs_class = self.class_embed_out(hs)
 		outputs_keypoints = self.pose_embed(hs).sigmoid()	
 
-		# print(outputs_keypoints[-1].shape)
 		out = {'pred_logits': outputs_class[-1], 'pred_keypoints': outputs_keypoints[-1]}
 		if self.aux_loss:
 			out['aux_outputs'] = self._set_aux_loss(outputs_class, outputs_keypoints)
