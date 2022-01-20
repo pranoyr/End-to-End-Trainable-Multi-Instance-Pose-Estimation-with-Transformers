@@ -133,9 +133,7 @@ def plot_results(pil_img, scores, keypoints):
 
 	for s, keypoints, c in zip(scores, keypoints.tolist(), COLORS * 100):
 		cls_ = s.argmax()
-		text = "person"
-		print(text)
-
+		
 		for joint in keypoints:
 			if joint[0] >= 0 and joint[1] >= 0:
 				cv2.circle(img, (joint[0], joint[1]), 2, (255,0,0), -1)
