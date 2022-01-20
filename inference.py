@@ -111,7 +111,6 @@ def detect(im, model, transform):
 	w, h = im.size
 	A_pred =  A_pred  *  torch.tensor([w, h] * 17, dtype = torch.float32)
 	keypoints_scaled = A_pred.view(-1, 17, 2)
-	print(keypoints_scaled.shape)
 	
 	return  predictions[keep] , keypoints_scaled.type(torch.int32)
 
