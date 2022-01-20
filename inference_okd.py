@@ -194,7 +194,7 @@ def plot_results(img, scores, keypoints):
 			if joint[0] >= 0 and joint[1] >= 0:
 				cv2.circle(img_draw, (joint[0], joint[1]), 2, (255,0,0), -1)
 		# # draw neck
-	x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, (keypoints[5][1] + keypoints[6][1]) / 2
+		x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, (keypoints[5][1] + keypoints[6][1]) / 2
 		cv2.circle(img_draw, (int(x), int(y)), 2, (0,255,0), -1)
 
 		# ax.text(xmin, ymin, text, fontsize=15,
