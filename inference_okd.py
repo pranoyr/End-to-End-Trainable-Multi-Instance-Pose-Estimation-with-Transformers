@@ -225,6 +225,7 @@ with dai.Device(pipeline) as device:
 		# Get BGR frame from NV12 encoded video frame to show with opencv
 		# Visualizing the frame on slower hosts might have overhead
 		im = videoIn.getCvFrame()
+		print(im.shape)
 
 		im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
 		im = Image.fromarray(im)
