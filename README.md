@@ -30,6 +30,12 @@ Once you have downloaded the dataset, start training ->
 python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_path ./data/ --batch_size 4 --pretrained ./detr-r50-e632da11.pth
 ```
 
+## Resume from a checkpoint
+```
+python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_path ./data/ --batch_size 4 --resume ./snapshots/model.pth
+```
+
+
 ## Trained Weights till 100 epochs
 Accuracy is still improving, this is not the final weights after 250 epochs.
 ```
