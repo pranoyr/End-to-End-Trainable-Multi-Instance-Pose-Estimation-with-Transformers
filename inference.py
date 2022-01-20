@@ -120,7 +120,7 @@ To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("./000000118249.jpg")
+im = Image.open("./examples/000000000241.jpg")
 
 scores, keypoints = detect(im, model, transform)
 
@@ -144,5 +144,5 @@ def plot_results(pil_img, scores, keypoints):
 		x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, keypoints[5][1]
 		cv2.circle(img, (int(x), int(y)), 2, (255,0,0), -1)
 	
-	cv2.imwrite("./image.jpg", cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
+	cv2.imwrite("examples/result.jpg", cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 plot_results(im, scores, keypoints)
