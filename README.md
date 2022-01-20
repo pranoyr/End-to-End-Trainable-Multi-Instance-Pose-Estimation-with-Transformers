@@ -1,7 +1,7 @@
 # End-to-End Trainable Multi-Instance Pose Estimation with Transformers
 
 # POET
-Implementation of POET
+Implementation of POET for pose estimation
 <!-- ![alt text](https://raw.githubusercontent.com/HHTseng/video-classification/master/fig/CRNN.png) -->
 
 # Getting Started
