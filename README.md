@@ -10,7 +10,9 @@ Implementation of POET for pose estimation
 * Python 3
 
 ### Pretrained weights from Detr
+```
 wget https://dl.fbaipublicfiles.com/detr/detr-r50-e632da11.pth
+```
 
 
 ### COCO Dataset
