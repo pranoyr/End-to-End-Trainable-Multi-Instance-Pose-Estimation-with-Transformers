@@ -37,6 +37,10 @@ python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_p
 python inference.py
 ```
 
+## To Do
+Evaluation script
+
+
 ## References
 * https://arxiv.org/pdf/2103.12115.pdf
 * https://github.com/facebookresearch/detr
