@@ -16,4 +16,3 @@ experiment-*
 not_tracked_dir/
 .vscode
 /data
-*.jpg
