@@ -33,9 +33,9 @@ python inference.py
 ```
 
 ## References
-* https://github.com/kenshohara/video-classification-3d-cnn-pytorch
-* https://github.com/HHTseng/video-classification
+* https://arxiv.org/pdf/2103.12115.pdf
+* https://github.com/facebookresearch/detr
 
 ## License
-This project is licensed under the MIT License 
+This project is licensed under the Apache License 
 
