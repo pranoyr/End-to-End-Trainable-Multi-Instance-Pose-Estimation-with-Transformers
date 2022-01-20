@@ -46,7 +46,7 @@ model.to("cpu")
 model.eval()
 
 
-checkpoint = torch.load("./model.pth")
+checkpoint = torch.load("./snapshots/model.pth")
 model.load_state_dict(checkpoint["model"])
 
 
