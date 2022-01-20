@@ -33,7 +33,9 @@ python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_p
 ## Trained Weights till 100 epochs
 Accuracy is still improving, this is not the final weights after 250 epochs.
 ```
+cd models
 wget https://dl.fbaipublicfiles.com/detr/detr-r50-e632da11.pth
+
 ```
 
 
