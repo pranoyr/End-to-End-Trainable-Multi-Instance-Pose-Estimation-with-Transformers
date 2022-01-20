@@ -139,7 +139,7 @@ def plot_results(pil_img, scores, keypoints):
 				cv2.circle(img, (joint[0], joint[1]), 2, (255,0,0), -1)
 
 		# draw neck
-		x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, keypoints[5][1]
+		x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, (keypoints[5][1] + keypoints[6][1]) / 2
 		cv2.circle(img, (int(x), int(y)), 2, (255,0,0), -1)
 	
 	cv2.imwrite("examples/result.jpg", cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
