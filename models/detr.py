@@ -207,10 +207,11 @@ class SetCriterion(nn.Module):
 		losses = {}
 		losses['loss_bbox'] = total_keypoints_loss / num_boxes
 
-		losses["center_loss"] = torch.sum(center_loss) / num_boxes
-		losses["vis_loss"] = torch.sum(viz_loss) / num_boxes
-		losses["offset_loss"] = torch.sum(offset_loss) / num_boxes
-		losses["abs_loss"] = torch.sum(abs_loss) / num_boxes
+		losses["loss_center"] = torch.sum(center_loss) / num_boxes
+		losses["loss_vis"] = torch.sum(viz_loss) / num_boxes
+		losses["loss_abs"] = torch.sum(abs_loss) / num_boxes
+		losses["loss_offset"] = torch.sum(offset_loss) / num_boxes
+		
 		
 
 		# loss_giou = 1 - torch.diag(box_ops.generalized_box_iou(
