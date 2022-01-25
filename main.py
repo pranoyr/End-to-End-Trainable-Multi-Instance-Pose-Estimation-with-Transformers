@@ -171,11 +171,11 @@ def main(args):
 
     output_dir = Path(args.output_dir)
     if args.pretrained:
-        if args.resume.startswith('https'):
+        if args.pretrained.startswith('https'):
             checkpoint = torch.hub.load_state_dict_from_url(
-                args.resume, map_location='cpu', check_hash=True)
+                args.pretrained, map_location='cpu', check_hash=True)
         else:
-            checkpoint = torch.load(args.resume)
+            checkpoint = torch.load(args.pretrained)
 
     
         state_dict = checkpoint['model'].copy()
