@@ -1,14 +1,25 @@
 import torch
 
 
-Z = torch.tensor([[1, 2,3,4,5,6,7,8,9,10], 
-                 [1, 2,3,4,5,6,7,8,9,10]], dtype=torch.float32)
+# Z = torch.tensor([[1, 2,3,4,5,6,7,8,9,10], 
+#                  [1, 2,3,4,5,6,7,8,9,10]], dtype=torch.float32)
 
-C_pred_expand = torch.repeat_interleave(Z, 2, dim=1)
-print(C_pred_expand)
+# C_pred_expand = torch.repeat_interleave(Z, 2, dim=1)
+# print(C_pred_expand)
 
 
 
+a = torch.tensor([[1,2,3],
+                    [4,5,6]], dtype=torch.float32)
+
+
+b = torch.tensor([[6 ,7,8],
+                    [9,10,11]], dtype=torch.float32)
+
+
+viz_loss  =  torch.cdist(a, b, p=2)
+
+print(viz_loss.square())
 
 
 

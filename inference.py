@@ -46,7 +46,7 @@ model.to("cpu")
 model.eval()
 
 
-checkpoint = torch.load("./snapshots/model.pth")
+checkpoint = torch.load("./model.pth")
 model.load_state_dict(checkpoint["model"])
 
 
@@ -93,7 +93,7 @@ def detect(im, model, transform):
 
 	# keep only predictions with 0.7+ confidence
 	predictions = outputs['pred_logits'].softmax(-1)[0, :, :-1]
-	keep = predictions.max(-1).values > 0.7
+	keep = predictions.max(-1).values > 0.5
 	keypoints = outputs['pred_keypoints'][0, keep]
 	print(keypoints.shape)
 
@@ -102,8 +102,10 @@ def detect(im, model, transform):
 	Z_pred = keypoints[:, 2:36] # shape (N, 34)
 	V_pred = keypoints[:, 36:] 	# shape (N, 17)
 
+	V_pred = torch.repeat_interleave(V_pred, 2, dim=1)
 	C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
 	A_pred = C_pred_expand + Z_pred # torch.size([num_persons, 34])
+	A_pred[V_pred < 0.5] = -1
 	#A_pred = A_pred[torch.repeat_interleave(V_pred, 2, dim=1) > 0].view(-1,34)
 
 	# rescale bounding boxes to absolute image coordinates
@@ -124,7 +126,7 @@ To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("./000000000839.jpg")
+im = Image.open("/home/pranoy/Downloads/adult-students-hands-up-class-104154747.jpg")
 
 scores, keypoints = detect(im, model, transform)
 

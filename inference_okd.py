@@ -88,7 +88,7 @@ model.to("cuda")
 model.eval()
 
 
-checkpoint = torch.load("./snapshots/model.pth")
+checkpoint = torch.load("./model.pth")
 model.load_state_dict(checkpoint["model"])
 
 
@@ -201,7 +201,7 @@ def plot_results(img, scores, keypoints):
 	# 	# 		bbox=dict(facecolor='yellow', alpha=0.5))
 	# plt.axis('off')
 	# plt.show()
-	img_draw = cv2.resize(img_draw, (1920, 1280))
+	img_draw = cv2.resize(img_draw, (1280, 720))
 	cv2.imshow("draw", cv2.cvtColor(img_draw, cv2.COLOR_RGB2BGR))
 	writer.write(cv2.resize(cv2.cvtColor(img_draw, cv2.COLOR_RGB2BGR), (1280, 720)))
 	cv2.waitKey(1)
