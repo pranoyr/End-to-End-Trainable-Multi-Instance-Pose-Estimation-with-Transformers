@@ -89,7 +89,7 @@ def get_args_parser():
     parser.add_argument('--device', default='cuda',
                         help='device to use for training / testing')
     parser.add_argument('--seed', default=42, type=int)
-    parser.add_argument('--resume', default='', help='resume from checkpoint')
+    parser.add_argument('--resume', help='resume from checkpoint')
     parser.add_argument('--pretrained', default='', help='Using pretraied weights of MM and detr')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
