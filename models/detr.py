@@ -210,7 +210,7 @@ class SetCriterion(nn.Module):
 		# losses['center_loss'] = center_loss / num_boxes
 		# losses['vis_loss'] = viz_loss / num_boxes
 		# losses['offset_loss'] = offset_loss / num_boxes
-		losses['abs_loss'] = abs_loss / num_boxes
+		# losses['abs_loss'] = abs_loss / num_boxes
 		
 		# loss_giou = 1 - torch.diag(box_ops.generalized_box_iou(
 		# 	box_ops.box_cxcywh_to_xyxy(src_boxes),
