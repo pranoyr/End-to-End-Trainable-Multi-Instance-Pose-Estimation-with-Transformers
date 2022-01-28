@@ -36,13 +36,13 @@ python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_p
 ```
 
 
-## Trained Weights till 100 epochs
+<!-- ## Trained Weights till 100 epochs
 Accuracy is still improving, this is not the final weights after 250 epochs.
 ```
 cd snapshots
 wget https://www.dropbox.com/s/3tvcfvynuwa9wdw/model.pth?dl=0
 
-```
+``` -->
 
 
 ## Inference
