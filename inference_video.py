@@ -168,7 +168,7 @@ def plot_results(img, scores, keypoints):
 
 
 
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture("/home/pranoy/class.mp4")
 # cam = cv2.VideoCapture("rtsp://admin:l2dtech123@192.168.2.33:554/cam/realmonitor?channel=1&subtype=0")
 
 while True:

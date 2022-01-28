@@ -102,18 +102,18 @@ def detect(im, model, transform):
 	Z_pred = keypoints[:, 2:36] # shape (N, 34)
 	V_pred = keypoints[:, 36:] 	# shape (N, 17)
 
-	print(Z_pred)
+	# print(Z_pred)
 
-	V_pred = torch.repeat_interleave(V_pred, 2, dim=1)
-	C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
-	A_pred = C_pred_expand + Z_pred # torch.size([num_persons, 34])
-	A_pred[V_pred < 0.5] = -1
-	#A_pred = A_pred[torch.repeat_interleave(V_pred, 2, dim=1) > 0].view(-1,34)
+	# V_pred = torch.repeat_interleave(V_pred, 2, dim=1)
+	# C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
+	# A_pred = C_pred_expand + Z_pred # torch.size([num_persons, 34])
+	# A_pred[V_pred < 0.5] = -1
+	# #A_pred = A_pred[torch.repeat_interleave(V_pred, 2, dim=1) > 0].view(-1,34)
 
-	# rescale bounding boxes to absolute image coordinates
+	# # rescale bounding boxes to absolute image coordinates
 	w, h = im.size
-	A_pred =  A_pred  *  torch.tensor([w, h] * 17, dtype = torch.float32)
-	keypoints_scaled = A_pred.view(-1, 17, 2)
+	A_pred =  C_pred  *  torch.tensor([w, h], dtype = torch.float32)
+	keypoints_scaled = A_pred.view(-1, 2, 2)
 	print(keypoints_scaled.shape)
 	
 
@@ -152,9 +152,9 @@ def plot_results(pil_img, scores, keypoints):
 		for joint in keypoints:
 			cv2.circle(img, (joint[0], joint[1]), 2, (255,0,0), -1)
 		
-		# draw neck
-		x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, (keypoints[5][1] + keypoints[6][1]) / 2
-		cv2.circle(img, (int(x), int(y)), 2, (0,255,0), -1)
+		# # draw neck
+		# x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, (keypoints[5][1] + keypoints[6][1]) / 2
+		# cv2.circle(img, (int(x), int(y)), 2, (0,255,0), -1)
 
 		# ax.text(xmin, ymin, text, fontsize=15,
 	# 	# 		bbox=dict(facecolor='yellow', alpha=0.5))
