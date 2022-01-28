@@ -68,7 +68,7 @@ class DETR(nn.Module):
 		hs = self.transformer(self.input_proj(src), mask, self.query_embed.weight, pos[-1])[0]
 
 		outputs_class = self.class_embed_out(hs)
-		outputs_keypoints = self.pose_embed(hs).sigmoid()	
+		outputs_keypoints = self.pose_embed(hs)	
 
 		out = {'pred_logits': outputs_class[-1], 'pred_keypoints': outputs_keypoints[-1]}
 		if self.aux_loss:
