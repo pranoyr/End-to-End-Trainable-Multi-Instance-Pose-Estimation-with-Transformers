@@ -70,7 +70,7 @@ class DETR(nn.Module):
 
 
 		outputs_class = self.class_embed_out(hs)
-		outputs_keypoints = self.pose_embed(hs).sigmoid()	
+		outputs_keypoints = self.pose_embed(hs)
 
 		# print(outputs_keypoints[-1].shape)
 		out = {'pred_logits': outputs_class[-1], 'pred_keypoints': outputs_keypoints[-1]}
