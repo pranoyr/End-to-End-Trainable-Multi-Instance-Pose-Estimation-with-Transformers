@@ -105,7 +105,7 @@ class CocoDetection(torch.utils.data.Dataset):
             img, target = self._transforms(img, target)
         target["labels"] = target["labels"] - 1
 
-       
+        print(target["keypoints"].shape)
         return img, target
 
 
