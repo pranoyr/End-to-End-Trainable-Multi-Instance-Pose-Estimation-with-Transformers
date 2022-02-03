@@ -182,16 +182,18 @@ def main(args):
             if k[:8] == 'backbone':
                 state_dict.pop(k)
 
+        model_without_ddp.load_state_dict(state_dict, strict = False)
+
     if args.resume:
         checkpoint = torch.load(args.resume)
         state_dict = checkpoint['model']
 
-    model_without_ddp.load_state_dict(state_dict, strict = False)
+        model_without_ddp.load_state_dict(state_dict)
         
-    if 'optimizer' in checkpoint and 'lr_scheduler' in checkpoint and 'epoch' in checkpoint:
-        optimizer.load_state_dict(checkpoint['optimizer'])
-        lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
-        args.start_epoch = checkpoint['epoch'] + 1
+        if 'optimizer' in checkpoint and 'lr_scheduler' in checkpoint and 'epoch' in checkpoint:
+            optimizer.load_state_dict(checkpoint['optimizer'])
+            lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
+            args.start_epoch = checkpoint['epoch'] + 1
 
     if args.eval:
         test_stats, coco_evaluator = evaluate(model, criterion, postprocessors,
