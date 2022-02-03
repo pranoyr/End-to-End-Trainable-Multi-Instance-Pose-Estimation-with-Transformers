@@ -113,6 +113,7 @@ def detect(im, model, transform):
 	# # rescale bounding boxes to absolute image coordinates
 	w, h = im.size
 	A_pred =  C_pred  *  torch.tensor([w, h], dtype = torch.float32)
+	print(A_pred.shape)
 	keypoints_scaled = A_pred.view(-1, 2, 2)
 	print(keypoints_scaled.shape)
 	
@@ -128,7 +129,7 @@ To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("/home/pranoy/Downloads/adult-students-hands-up-class-104154747.jpg")
+im = Image.open("/home/pranoy/Downloads/640-01458463en_Masterfile.jpg")
 
 scores, keypoints = detect(im, model, transform)
 

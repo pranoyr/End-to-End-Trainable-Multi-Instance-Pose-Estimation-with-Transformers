@@ -85,6 +85,8 @@ def rescale_bboxes(out_bbox, size):
 def detect(im, model, transform):
 	# mean-std normalize the input image (batch-size: 1)
 	img = transform(im).unsqueeze(0)
+	print(im.size)
+	print(img.shape)
 
 	# demo model only support by default images with aspect ratio between 0.5 and 2
 	# if you want to use images with an aspect ratio outside this range
@@ -169,7 +171,7 @@ def plot_results(img, scores, keypoints):
 
 
 # cam = cv2.VideoCapture(0)
-cam = cv2.VideoCapture("rtsp://admin:l2dtech123@192.168.2.33:554/cam/realmonitor?channel=1&subtype=0")
+cam = cv2.VideoCapture(0)
 
 while True:
 	im = cam.read()[1]

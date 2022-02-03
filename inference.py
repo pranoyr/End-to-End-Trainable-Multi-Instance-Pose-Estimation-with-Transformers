@@ -102,7 +102,6 @@ def detect(im, model, transform):
 	Z_pred = keypoints[:, 2:36] # shape (N, 34)
 	V_pred = keypoints[:, 36:] 	# shape (N, 17)
 
-	print(Z_pred)
 
 	V_pred = torch.repeat_interleave(V_pred, 2, dim=1)
 	C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
@@ -128,8 +127,7 @@ To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("/home/pranoy/Downloads/adult-students-hands-up-class-104154747.jpg")
-
+im = Image.open("/home/pranoy/Downloads/640-01458463en_Masterfile.jpg")
 scores, keypoints = detect(im, model, transform)
 
 """Let's now visualize the model predictions"""

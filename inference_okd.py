@@ -126,6 +126,7 @@ def rescale_bboxes(out_bbox, size):
 def detect(im, model, transform):
 	# mean-std normalize the input image (batch-size: 1)
 	img = transform(im).unsqueeze(0)
+	print(img.shape)
 
 	# demo model only support by default images with aspect ratio between 0.5 and 2
 	# if you want to use images with an aspect ratio outside this range
