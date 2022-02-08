@@ -50,6 +50,8 @@ checkpoint = torch.load("./model.pth")
 model.load_state_dict(checkpoint["model"])
 
 
+
+
 # colors for visualization
 COLORS = [[0.000, 0.447, 0.741], [0.850, 0.325, 0.098], [0.929, 0.694, 0.125],
 		  [0.494, 0.184, 0.556], [0.466, 0.674, 0.188], [0.301, 0.745, 0.933]]
@@ -127,7 +129,7 @@ To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("/home/pranoy/Downloads/640-01458463en_Masterfile.jpg")
+im = Image.open("./000000000839.jpg")
 scores, keypoints = detect(im, model, transform)
 
 """Let's now visualize the model predictions"""

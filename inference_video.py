@@ -168,13 +168,26 @@ def plot_results(img, scores, keypoints):
 	writer.write(cv2.resize(img_draw, (1280, 720)))
 
 
+# FS normal calib values
+new_K = np.array([
+    [ 2248.545347183278, 0.0, 1865.7085154768697 ],
+    [ 0.0, 2240.0190172145935, 1047.1541673498305 ],
+    [ 0.0, 0.0, 1.00000000 ]
+]) ##camera matrix
+#new_D = np.array([-0.39386362, 0.15747938, -0.00040488, 0.00043409, -0.02956452]
+new_D = np.array([
+    -0.40458542062300373, 0.1781111846456439,
+    0.0005932818717192621, 1.0843747452146404e-05, -0.038806489237916825
+])
+
 
 
 # cam = cv2.VideoCapture(0)
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture("rtsp://admin:l2dtech123@192.168.2.44:554/cam/realmonitor?channel=1&subtype=0")
 
 while True:
 	im = cam.read()[1]
+	im = cv2.undistort(im, new_K, new_D, None)
 	im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
 	im = Image.fromarray(im)
 
