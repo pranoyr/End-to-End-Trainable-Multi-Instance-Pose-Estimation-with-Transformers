@@ -62,7 +62,7 @@ COLORS = [[0.000, 0.447, 0.741], [0.850, 0.325, 0.098], [0.929, 0.694, 0.125],
 
 # standard PyTorch mean-std input image normalization
 transform = T.Compose([
-	T.Resize(800, max_size = 1333),
+	T.Resize(400, max_size = 512),
 	T.ToTensor(),
 	T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
@@ -182,12 +182,12 @@ new_D = np.array([
 
 
 
-# cam = cv2.VideoCapture(0)
-cam = cv2.VideoCapture("rtsp://admin:l2dtech123@192.168.2.44:554/cam/realmonitor?channel=1&subtype=0")
+cam = cv2.VideoCapture(0)
+# cam = cv2.VideoCapture("/home/pranoy/Videos/complex_walk.mp4")
 
 while True:
 	im = cam.read()[1]
-	im = cv2.undistort(im, new_K, new_D, None)
+	#im = cv2.undistort(im, new_K, new_D, None)
 	im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
 	im = Image.fromarray(im)
 
