@@ -6,8 +6,8 @@ Implementation of POET for pose estimation
 
 # Getting Started
 ## Prerequisites
-* PyTorch 
-* Python 3
+* torchvision
+* python3
 * mmcv
 
 
