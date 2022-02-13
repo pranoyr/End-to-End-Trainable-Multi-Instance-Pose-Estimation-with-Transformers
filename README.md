@@ -6,6 +6,7 @@ Implementation of POET for pose estimation
 
 # Getting Started
 ### COCO Dataset
+Dowload the COCO Dataset and create the folder structure as mentioned below.
 
 ```
 + data 
@@ -25,12 +26,17 @@ Implementation of POET for pose estimation
 ## Train
 Once you have downloaded the dataset, start training ->
 ```
-python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_path ./data/ --batch_size 4
+python -m torch.distributed.launch --nproc_per_node=<number-of-gpus> --use_env main.py --coco_path ./data/ --batch_size <batch-size>
+```
+
+I trained using 2 Tesla-V100 with a batch size of 6.
+```
+python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_path ./data/ --batch_size 6
 ```
 
 ## Resume from a checkpoint
 ```
-python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_path ./data/ --batch_size 4 --resume ./snapshots/model.pth
+python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_path ./data/ --batch_size <batch-size> --resume ./snapshots/model.pth
 ```
 
 
