@@ -8,6 +8,7 @@ Implementation of POET for pose estimation
 ## Prerequisites
 * PyTorch 
 * Python 3
+* mmcv
 
 
 ### COCO Dataset
