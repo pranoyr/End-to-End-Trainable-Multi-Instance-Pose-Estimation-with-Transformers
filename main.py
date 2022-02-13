@@ -52,7 +52,7 @@ def get_args_parser():
                         help="Dropout applied in the transformer")
     parser.add_argument('--nheads', default=8, type=int,
                         help="Number of attention heads inside the transformer's attentions")
-    parser.add_argument('--num_queries', default=100, type=int,
+    parser.add_argument('--num_queries', default=25, type=int,
                         help="Number of query slots")
     parser.add_argument('--pre_norm', action='store_true')
 
@@ -170,20 +170,7 @@ def main(args):
         model_without_ddp.detr.load_state_dict(checkpoint['model'])
 
     output_dir = Path(args.output_dir)
-    if args.pretrained:
-        if args.pretrained.startswith('https'):
-            checkpoint = torch.hub.load_state_dict_from_url(
-                args.pretrained, map_location='cpu', check_hash=True)
-        else:
-            checkpoint = torch.load(args.pretrained)
-
-        state_dict = checkpoint['model'].copy()
-        for k, v in checkpoint['model'].items():
-            if k[:8] == 'backbone':
-                state_dict.pop(k)
-
-        model_without_ddp.load_state_dict(state_dict, strict = False)
-
+    
     if args.resume:
         checkpoint = torch.load(args.resume)
         state_dict = checkpoint['model']
