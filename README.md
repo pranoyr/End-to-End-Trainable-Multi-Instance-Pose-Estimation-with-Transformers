@@ -9,11 +9,6 @@ Implementation of POET for pose estimation
 * PyTorch 
 * Python 3
 
-### Pretrained weights from Detr
-```
-wget https://dl.fbaipublicfiles.com/detr/detr-r50-e632da11.pth
-```
-
 
 ### COCO Dataset
 
@@ -27,7 +22,7 @@ wget https://dl.fbaipublicfiles.com/detr/detr-r50-e632da11.pth
 ## Train
 Once you have downloaded the dataset, start training ->
 ```
-python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_path ./data/ --batch_size 4 --pretrained ./detr-r50-e632da11.pth
+python -m torch.distributed.launch --nproc_per_node=2 --use_env main.py --coco_path ./data/ --batch_size 4
 ```
 
 ## Resume from a checkpoint
