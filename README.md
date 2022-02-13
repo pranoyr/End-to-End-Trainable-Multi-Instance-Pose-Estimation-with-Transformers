@@ -16,7 +16,7 @@ Implementation of POET for pose estimation
         .
     + train2017 
         - 1.jpg
-        -2.jpg
+        - 2.jpg
         .
         .
 ```
