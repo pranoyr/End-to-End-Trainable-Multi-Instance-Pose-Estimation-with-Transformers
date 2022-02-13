@@ -10,7 +10,15 @@ Implementation of POET for pose estimation
 ```
 + data 
     + annotations   
+        - 1.xml
+        _ 2.xml
+        .
+        .
     + train2017 
+        - 1.jpg
+        -2.jpg
+        .
+        .
 ```
 
 
