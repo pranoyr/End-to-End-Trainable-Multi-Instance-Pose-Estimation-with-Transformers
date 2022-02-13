@@ -5,12 +5,6 @@ Implementation of POET for pose estimation
 <!-- ![alt text](https://raw.githubusercontent.com/HHTseng/video-classification/master/fig/CRNN.png) -->
 
 # Getting Started
-## Prerequisites
-* torchvision
-* python3
-* mmcv
-
-
 ### COCO Dataset
 
 ```
