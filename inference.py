@@ -60,7 +60,7 @@ COLORS = [[0.000, 0.447, 0.741], [0.850, 0.325, 0.098], [0.929, 0.694, 0.125],
 
 # standard PyTorch mean-std input image normalization
 transform = T.Compose([
-	T.Resize(800, max_size=1333),
+	T.Resize(800, max_size= 1333),
 	T.ToTensor(),
 	T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
@@ -82,7 +82,11 @@ def rescale_bboxes(out_bbox, size):
 
 def detect(im, model, transform):
 	# mean-std normalize the input image (batch-size: 1)
+	print("org")
+	print(im.size)
 	img = transform(im).unsqueeze(0)
+	print("transformed")
+	print(img.shape)
 
 	# demo model only support by default images with aspect ratio between 0.5 and 2
 	# if you want to use images with an aspect ratio outside this range
@@ -91,14 +95,14 @@ def detect(im, model, transform):
 
 	# propagate through the model
 	outputs = model(img)
-	print(outputs['pred_keypoints'].shape)
+	# print(outputs['pred_keypoints'].shape)
 
 	# keep only predictions with 0.7+ confidence
 	predictions = outputs['pred_logits'].softmax(-1)[0, :, :-1]
-	print(predictions)
+	# print(predictions)
 	keep = predictions.max(-1).values > 0.5
 	keypoints = outputs['pred_keypoints'][0, keep]
-	print(keypoints.shape)
+	# print(keypoints.shape)
 
 
 	C_pred = keypoints[:, :2] # shape (N, 2)
@@ -110,13 +114,13 @@ def detect(im, model, transform):
 	C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
 	A_pred = C_pred_expand + Z_pred # torch.size([num_persons, 34])
 	A_pred[V_pred < 0.5] = -1
-	#A_pred = A_pred[torch.repeat_interleave(V_pred, 2, dim=1) > 0].view(-1,34)
+	#A_pred = A_pred[tjpgorch.repeat_interleave(V_pred, 2, dim=1) > 0].view(-1,34)
 
 	# rescale bounding boxes to absolute image coordinates
 	w, h = im.size
 	A_pred =  A_pred  *  torch.tensor([w, h] * 17, dtype = torch.float32)
 	keypoints_scaled = A_pred.view(-1, 17, 2)
-	print(keypoints_scaled.shape)
+	# print(keypoints_scaled.shape)
 	
 
 	# print(predictions.shape)
@@ -130,7 +134,7 @@ To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("/home/pranoy/Downloads/soccer.jpg")
+im = Image.open("/home/pranoy/Downloads/640-01458463en_Masterfile.jpg")
 scores, keypoints = detect(im, model, transform)
 
 """Let's now visualize the model predictions"""
@@ -140,6 +144,7 @@ def plot_results(pil_img, scores, keypoints):
 	# plt.imshow(pil_img)
 	# ax = plt.gca()
 	img = np.array(pil_img)
+
 	
 
 	for s, keypoints, c in zip(scores, keypoints.tolist(), COLORS * 100):
@@ -148,7 +153,7 @@ def plot_results(pil_img, scores, keypoints):
 		cls_ = s.argmax()
 		# text = f'{CLASSES[cl]}: {p[cl]:0.2f}'
 		text = "person"
-		print(text)
+
 
 		for joint in keypoints:
 			cv2.circle(img, (joint[0], joint[1]), 2, (255,0,0), -1)
@@ -161,6 +166,6 @@ def plot_results(pil_img, scores, keypoints):
 	# 	# 		bbox=dict(facecolor='yellow', alpha=0.5))
 	# plt.axis('off')
 	# plt.show()
-	cv2.imwrite("./image.jpg", cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
+	cv2.imwrite("./image1.jpg", cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 	# cv2.waitKey(0)
 plot_results(im, scores, keypoints)
