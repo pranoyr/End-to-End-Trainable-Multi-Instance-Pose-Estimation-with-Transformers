@@ -134,7 +134,7 @@ To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("/home/pranoy/Downloads/640-01458463en_Masterfile.jpg")
+im = Image.open("/home/pranoy/Downloads/istockphoto-1287413525-612x612.jpg")
 scores, keypoints = detect(im, model, transform)
 
 """Let's now visualize the model predictions"""
