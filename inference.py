@@ -46,7 +46,7 @@ model.to("cpu")
 model.eval()
 
 
-checkpoint = torch.load("./model.pth")
+checkpoint = torch.load("./model_255_epoch.pth")
 model.load_state_dict(checkpoint["model"])
 
 
@@ -134,7 +134,7 @@ To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("/home/pranoy/Downloads/istockphoto-1287413525-612x612.jpg")
+im = Image.open("/home/pranoy/Downloads/a.jpg")
 scores, keypoints = detect(im, model, transform)
 
 """Let's now visualize the model predictions"""
