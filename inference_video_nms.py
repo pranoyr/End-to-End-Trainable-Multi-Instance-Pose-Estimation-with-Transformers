@@ -15,8 +15,11 @@ We show how to define the model, load pretrained weights and visualize bounding 
 Let's start with some common imports.
 """
 
+from torchvision.ops import batched_nms
 # Commented out IPython magic to ensure Python compatibility.
+from ntpath import join
 from PIL import Image
+import time
 import cv2
 import numpy as np
 import requests
@@ -38,18 +41,18 @@ Here is a minimal implementation of DETR:
 from main import get_args_parser
 from models import build_model
 
+writer = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'XVID'), 20, (1280, 720))
+
 parser = argparse.ArgumentParser('DETR training and evaluation script', parents=[get_args_parser()])
 args = parser.parse_args()
 
 model, criterion, postprocessors = build_model(args)
-model.to("cpu")
+model.to("cuda")
 model.eval()
 
 
-checkpoint = torch.load("./model.pth")
+checkpoint = torch.load("./model_255_epoch.pth")
 model.load_state_dict(checkpoint["model"])
-
-
 
 
 # colors for visualization
@@ -60,7 +63,7 @@ COLORS = [[0.000, 0.447, 0.741], [0.850, 0.325, 0.098], [0.929, 0.694, 0.125],
 
 # standard PyTorch mean-std input image normalization
 transform = T.Compose([
-	T.Resize(800, max_size= 1333),
+	T.Resize(800, max_size = 1333),
 	T.ToTensor(),
 	T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
@@ -72,6 +75,18 @@ def box_cxcywh_to_xyxy(x):
 		 (x_c + 0.5 * w), (y_c + 0.5 * h)]
 	return torch.stack(b, dim=1)
 
+
+def extract_bounding_box(keypoints):
+	bboxes = []
+	for points in keypoints:
+		x_coordinates, y_coordinates = zip(*points)
+		bboxes.append([min(x_coordinates), min(y_coordinates), max(x_coordinates), max(y_coordinates)])
+
+	return torch.tensor(bboxes)
+
+
+
+
 def rescale_bboxes(out_bbox, size):
 	img_w, img_h = size
 	b = box_cxcywh_to_xyxy(out_bbox)
@@ -82,10 +97,8 @@ def rescale_bboxes(out_bbox, size):
 
 def detect(im, model, transform):
 	# mean-std normalize the input image (batch-size: 1)
-	print("org")
-	print(im.size)
 	img = transform(im).unsqueeze(0)
-	print("transformed")
+	print(im.size)
 	print(img.shape)
 
 	# demo model only support by default images with aspect ratio between 0.5 and 2
@@ -94,78 +107,117 @@ def detect(im, model, transform):
 	assert img.shape[-2] <= 1600 and img.shape[-1] <= 1600, 'demo model only supports images up to 1600 pixels on each side'
 
 	# propagate through the model
-	outputs = model(img)
-	# print(outputs['pred_keypoints'].shape)
+	outputs = model(img.cuda())
+	print(outputs['pred_keypoints'].shape)
 
 	# keep only predictions with 0.7+ confidence
 	predictions = outputs['pred_logits'].softmax(-1)[0, :, :-1]
-	# print(predictions)
 	keep = predictions.max(-1).values > 0.5
 	keypoints = outputs['pred_keypoints'][0, keep]
-	# print(keypoints.shape)
+	print(keypoints.shape)
 
 
 	C_pred = keypoints[:, :2] # shape (N, 2)
 	Z_pred = keypoints[:, 2:36] # shape (N, 34)
 	V_pred = keypoints[:, 36:] 	# shape (N, 17)
 
-
 	V_pred = torch.repeat_interleave(V_pred, 2, dim=1)
 	C_pred_expand = torch.repeat_interleave(C_pred.unsqueeze(1), 17, dim=1).view(-1,34)
 	A_pred = C_pred_expand + Z_pred # torch.size([num_persons, 34])
 	A_pred[V_pred < 0.5] = -1
-	#A_pred = A_pred[tjpgorch.repeat_interleave(V_pred, 2, dim=1) > 0].view(-1,34)
+	#A_pred = A_pred[torch.repeat_interleave(V_pred, 2, dim=1) > 0].view(-1,34)
 
 	# rescale bounding boxes to absolute image coordinates
 	w, h = im.size
-	A_pred =  A_pred  *  torch.tensor([w, h] * 17, dtype = torch.float32)
+	A_pred =  A_pred  *  torch.tensor([w, h] * 17, dtype = torch.float32, device="cuda")
 	keypoints_scaled = A_pred.view(-1, 17, 2)
-	# print(keypoints_scaled.shape)
-	
+	print(keypoints_scaled.shape)
+
+	#  non-maximum suppression
+	# bboxes = extract_bounding_box(keypoints_scaled)
+	# idxs = torch.tensor([0]*len(bboxes), device="cuda")
+	# ids = batched_nms(bboxes.to("cuda"), predictions[keep].squeeze(1), idxs, 0.9)
+
+	# keypoints_scaled = keypoints_scaled[ids]
+
+
 
 	# print(predictions.shape)
 	# print(predictions[keep])
 	# print(keypoints.shape)
 
-	return  predictions[keep] , keypoints_scaled.type(torch.int32)
+	return  keypoints_scaled.type(torch.int32)
 
 """## Using DETR
 To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("/home/pranoy/Downloads/a.jpg")
-scores, keypoints = detect(im, model, transform)
 
-"""Let's now visualize the model predictions"""
-
-def plot_results(pil_img, scores, keypoints):
+def plot_results(img, keypoints):
 	# plt.figure(figsize=(16,10))
 	# plt.imshow(pil_img)
 	# ax = plt.gca()
-	img = np.array(pil_img)
-
+	img_draw = np.array(img)
+	# img_draw = img.copy()
 	
 
-	for s, keypoints, c in zip(scores, keypoints.tolist(), COLORS * 100):
+	for keypoints, c in zip(keypoints.tolist(), COLORS * 100):
 		# ax.add_patch(plt.Rectangle((xmin, ymin), xmax - xmin, ymax - ymin,
 		# 						   fill=False, color=c, linewidth=3))
-		cls_ = s.argmax()
+		# cls_ = s.argmax()
 		# text = f'{CLASSES[cl]}: {p[cl]:0.2f}'
 		text = "person"
-
+		print(text)
 
 		for joint in keypoints:
-			cv2.circle(img, (joint[0], joint[1]), 2, (255,0,0), -1)
-		
-		# draw neck
-		x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, (keypoints[5][1] + keypoints[6][1]) / 2
-		cv2.circle(img, (int(x), int(y)), 2, (0,255,0), -1)
+			if joint[0] >= 0 and joint[1] >= 0:
+				cv2.circle(img_draw, (joint[0], joint[1]), 2, (255,0,0), -1)
 
+		x, y  = (keypoints[5][0] + keypoints[6][0]) / 2, (keypoints[5][1] + keypoints[6][1]) / 2
+		cv2.circle(img_draw, (int(x), int(y)), 2, (0,255,0), -1)
+
+		
 		# ax.text(xmin, ymin, text, fontsize=15,
 	# 	# 		bbox=dict(facecolor='yellow', alpha=0.5))
 	# plt.axis('off')
 	# plt.show()
-	cv2.imwrite("./image1.jpg", cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
-	# cv2.waitKey(0)
-plot_results(im, scores, keypoints)
+	img_draw = cv2.resize(img_draw, (1920, 1280))
+	cv2.imshow("draw", cv2.cvtColor(img_draw, cv2.COLOR_RGB2BGR))
+	cv2.waitKey(0)
+
+	writer.write(cv2.resize(img_draw, (1280, 720)))
+
+
+# FS normal calib values
+new_K = np.array([
+    [ 2248.545347183278, 0.0, 1865.7085154768697 ],
+    [ 0.0, 2240.0190172145935, 1047.1541673498305 ],
+    [ 0.0, 0.0, 1.00000000 ]
+]) ##camera matrix
+#new_D = np.array([-0.39386362, 0.15747938, -0.00040488, 0.00043409, -0.02956452]
+new_D = np.array([
+    -0.40458542062300373, 0.1781111846456439,
+    0.0005932818717192621, 1.0843747452146404e-05, -0.038806489237916825
+])
+
+
+
+# cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture("/home/pranoy/Downloads/family_picture.jpg")
+# cam = cv2.VideoCapture("rtsp://admin:l2dtech123@192.168.2.33:554/live #back camera")
+
+while True:
+	im = cam.read()[1]
+	#im = cv2.undistort(im, new_K, new_D, None)
+	im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
+	im = Image.fromarray(im)
+
+	start = time.time()
+	keypoints = detect(im, model, transform)
+	print(f'Inference time: {time.time() - start:.3f}s')
+	plot_results(im.copy(), keypoints)
+
+	"""Let's now visualize the model predictions"""
+
+	
