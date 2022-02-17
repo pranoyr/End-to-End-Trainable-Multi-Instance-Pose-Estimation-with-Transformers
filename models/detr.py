@@ -245,15 +245,16 @@ class SetCriterion(nn.Module):
 		"""
 		outputs_without_aux = {k: v for k, v in outputs.items() if k != 'aux_outputs'}
 
-		# Retrieve the matching between the outputs of the last layer and the targets
-		indices = self.matcher(outputs_without_aux, targets)
-
+		
 		# Compute the average number of target boxes accross all nodes, for normalization purposes
 		num_boxes = sum(len(t["labels"]) for t in targets)
 		num_boxes = torch.as_tensor([num_boxes], dtype=torch.float, device=next(iter(outputs.values())).device)
 		if is_dist_avail_and_initialized():
 			torch.distributed.all_reduce(num_boxes)
 		num_boxes = torch.clamp(num_boxes / get_world_size(), min=1).item()
+
+		# Retrieve the matching between the outputs of the last layer and the targets
+		indices = self.matcher(outputs_without_aux, targets, num_boxes)
 
 		# Compute all the requested losses
 		losses = {}
@@ -263,7 +264,7 @@ class SetCriterion(nn.Module):
 		# In case of auxiliary losses, we repeat this process with the output of each intermediate layer.
 		if 'aux_outputs' in outputs:
 			for i, aux_outputs in enumerate(outputs['aux_outputs']):
-				indices = self.matcher(aux_outputs, targets)
+				indices = self.matcher(aux_outputs, targets, num_boxes)
 				for loss in self.losses:
 					if loss == 'masks':
 						# Intermediate masks losses are too costly to compute, we ignore them.
