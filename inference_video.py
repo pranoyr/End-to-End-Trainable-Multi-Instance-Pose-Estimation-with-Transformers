@@ -50,7 +50,7 @@ model.to("cuda")
 model.eval()
 
 
-checkpoint = torch.load("./model_25_query_epoch_68.pth")
+checkpoint = torch.load("./model.pth")
 model.load_state_dict(checkpoint["model"])
 
 
@@ -182,12 +182,12 @@ new_D = np.array([
 
 
 
-# cam = cv2.VideoCapture(0)
-cam = cv2.VideoCapture("/home/pranoy/Videos/complex_walk.mp4")
+cam = cv2.VideoCapture(0)
+# cam = cv2.VideoCapture("/home/pranoy/Videos/complex_walk.mp4")
 
 while True:
 	im = cam.read()[1]
-	im = cv2.undistort(im, new_K, new_D, None)
+	# im = cv2.undistort(im, new_K, new_D, None)
 	im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
 	im = Image.fromarray(im)
 
