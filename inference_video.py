@@ -62,7 +62,7 @@ COLORS = [[0.000, 0.447, 0.741], [0.850, 0.325, 0.098], [0.929, 0.694, 0.125],
 
 # standard PyTorch mean-std input image normalization
 transform = T.Compose([
-	T.Resize(800, max_size = 1333),
+	T.Resize((512,512)),
 	T.ToTensor(),
 	T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
