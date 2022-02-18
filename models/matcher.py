@@ -90,11 +90,11 @@ class HungarianMatcher(nn.Module):
 
         Vgt_ = torch.repeat_interleave(V_gt , 2, dim=1)
         offset_loss = [torch.cdist(Z_pred * v_gt_single.unsqueeze(0), z_gt_single.unsqueeze(0) * v_gt_single.unsqueeze(0), p=1) for v_gt_single, z_gt_single in zip(Vgt_, Z_gt)] 
-        offset_loss = torch.cat(offset_loss, dim=1) / num_boxes
-        viz_loss  =  torch.cdist(V_pred, V_gt, p=2).square() / num_boxes
-        center_loss =  torch.cdist(C_pred ,C_gt, p=2).square() / num_boxes
+        offset_loss = torch.cat(offset_loss, dim=1)
+        viz_loss  =  torch.cdist(V_pred, V_gt, p=2).square()
+        center_loss =  torch.cdist(C_pred ,C_gt, p=2).square()
         abs_loss = [torch.cdist(A_pred * v_gt_single.unsqueeze(0), a_gt_single.unsqueeze(0) * v_gt_single.unsqueeze(0), p=1) for v_gt_single, a_gt_single in zip(Vgt_, A_gt)] 
-        abs_loss = torch.cat(abs_loss, dim=1) / num_boxes
+        abs_loss = torch.cat(abs_loss, dim=1)
 
         C =  self.cost_class * cost_class +  self.l_deltas * offset_loss + self.l_vis * viz_loss + self.l_ctr * center_loss + self.l_abs * abs_loss
         C = C.view(bs, num_queries, -1).cpu()
