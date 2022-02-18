@@ -42,11 +42,11 @@ parser = argparse.ArgumentParser('DETR training and evaluation script', parents=
 args = parser.parse_args()
 
 model, criterion, postprocessors = build_model(args)
-model.to("cuda")
+model.to("cpu")
 model.eval()
 
 
-checkpoint = torch.load("./snapshots/model.pth")
+checkpoint = torch.load("./model_255_epoch.pth")
 model.load_state_dict(checkpoint["model"])
 
 
@@ -88,7 +88,7 @@ def detect(im, model, transform):
 	assert img.shape[-2] <= 1600 and img.shape[-1] <= 1600, 'demo model only supports images up to 1600 pixels on each side'
 
 	# propagate through the model
-	outputs = model(img.cuda())
+	outputs = model(img)
 	print(outputs['pred_keypoints'].shape)
 
 	# keep only predictions with 0.7+ confidence
