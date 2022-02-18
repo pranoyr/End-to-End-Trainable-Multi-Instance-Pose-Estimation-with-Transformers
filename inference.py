@@ -60,7 +60,7 @@ COLORS = [[0.000, 0.447, 0.741], [0.850, 0.325, 0.098], [0.929, 0.694, 0.125],
 
 # standard PyTorch mean-std input image normalization
 transform = T.Compose([
-	# T.Resize(50, max_size=512),
+	# T.Resize(500, max_size=512),
 	T.Resize((512, 512)),
 	T.ToTensor(),
 	T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
@@ -135,7 +135,7 @@ To try DETRdemo model on your own image just change the URL below.
 """
 
 # url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-im = Image.open("/home/pranoy/Downloads/adult-students-hands-up-class-104154747.jpg")
+im = Image.open("/home/pranoy/Downloads/istockphoto-1287413525-612x612.jpg")
 scores, keypoints = detect(im, model, transform)
 
 """Let's now visualize the model predictions"""
