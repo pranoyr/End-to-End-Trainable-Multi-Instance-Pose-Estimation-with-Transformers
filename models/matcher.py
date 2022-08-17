@@ -122,8 +122,8 @@ class HungarianMatcher(nn.Module):
 
 		# offset_loss =  torch.cdist(Z_pred, Z_gt, p=1)
 		# offset_loss =  torch.cdist(torch.cat([Vgt_, torch.zeros(len(Z_pred)-len(V_gt), 34).cuda()]) * Z_pred, Vgt_ * Z_gt, p=1)
-		viz_loss  =  torch.cdist(V_pred, V_gt, p=2).square() / num_boxes
-		center_loss =  torch.cdist(C_pred ,C_gt, p=2).square() / num_boxes
+		viz_loss  =  torch.cdist(V_pred, V_gt, p=2)/ num_boxes
+		center_loss =  torch.cdist(C_pred ,C_gt, p=2)/ num_boxes
 
 		abs_loss = [torch.cdist(A_pred * v_gt_single.unsqueeze(0), a_gt_single.unsqueeze(0) * v_gt_single.unsqueeze(0), p=1) for v_gt_single, a_gt_single in zip(Vgt_, A_gt)] 
 		abs_loss = torch.cat(abs_loss, dim=1) / num_boxes
